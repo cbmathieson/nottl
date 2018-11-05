@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2110318F218EABE500CB99FF /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110318E218EABE500CB99FF /* Note.swift */; };
+		21103191218FD91700CB99FF /* NoteMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21103190218FD91700CB99FF /* NoteMarkerView.swift */; };
 		218CC64B216BF5AB00E6BE20 /* GPSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */; };
 		218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC650216C509300E6BE20 /* TabBarViewController.swift */; };
 		218CC653216C59C800E6BE20 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC652216C59C800E6BE20 /* ProfileViewController.swift */; };
@@ -20,6 +22,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2110318E218EABE500CB99FF /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		21103190218FD91700CB99FF /* NoteMarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteMarkerView.swift; sourceTree = "<group>"; };
 		218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSViewController.swift; sourceTree = "<group>"; };
 		218CC650216C509300E6BE20 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		218CC652216C59C800E6BE20 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
@@ -45,6 +49,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2110318D218EABBD00CB99FF /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2110318E218EABE500CB99FF /* Note.swift */,
+				21103190218FD91700CB99FF /* NoteMarkerView.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		218CC64E216C4D6E00E6BE20 /* Setup Pages */ = {
 			isa = PBXGroup;
 			children = (
@@ -84,6 +97,7 @@
 		21B87854215C0BC400B48CF1 /* nottl */ = {
 			isa = PBXGroup;
 			children = (
+				2110318D218EABBD00CB99FF /* Model */,
 				21B87855215C0BC400B48CF1 /* AppDelegate.swift */,
 				21B87859215C0BC400B48CF1 /* Main.storyboard */,
 				21F45B222166948B00849617 /* View */,
@@ -177,10 +191,12 @@
 				21F45B1D216540A100849617 /* LogInViewController.swift in Sources */,
 				218CC64B216BF5AB00E6BE20 /* GPSViewController.swift in Sources */,
 				21F45B1B2165408C00849617 /* CreateAccountViewController.swift in Sources */,
+				2110318F218EABE500CB99FF /* Note.swift in Sources */,
 				21B87856215C0BC400B48CF1 /* AppDelegate.swift in Sources */,
 				218CC653216C59C800E6BE20 /* ProfileViewController.swift in Sources */,
 				218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */,
 				21F45B2121654C2800849617 /* InitialViewController.swift in Sources */,
+				21103191218FD91700CB99FF /* NoteMarkerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

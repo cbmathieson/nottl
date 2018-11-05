@@ -19,13 +19,4 @@ class LogInViewController: UIViewController {
     @IBAction func unwindToInitialVC(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
-    
-    //Sets initial view for tabBar to center when transitioning
-    //Failed to impliment it within the UITabBarController. Will need to add it when opening app already logged in
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let tabBarController = segue.destination as! UITabBarController
-        
-        tabBarController.selectedIndex = 1
-    }
- 
 }

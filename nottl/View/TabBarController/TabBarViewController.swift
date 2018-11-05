@@ -15,26 +15,17 @@ class TabBarViewController: UITabBarController, UITabBarControllerDelegate {
 
         // Do any additional setup after loading the view.
         self.delegate = self
+        //Initial view is GPS page
+        self.selectedIndex = 1
     }
     
     //checks if already on gps tab when clicked, if so: resets location
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if tabBarController.selectedIndex == 1 {
             if let gpsVC = viewController as? GPSViewController {
-                gpsVC.findLocation()
+                gpsVC.updateMapWithAnimation()
             }
         }
         return true
     }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
