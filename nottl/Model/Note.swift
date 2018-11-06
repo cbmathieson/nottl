@@ -10,13 +10,20 @@ import Foundation
 
 import MapKit
 
+enum EventType: String {
+    case onEntry = "On Entry"
+    case onExit = "On Exit"
+}
+
 class Note: NSObject, MKAnnotation {
+    let id: String
     let userName: String
     let noteDescription: String
     let coordinate: CLLocationCoordinate2D
     let type: String
     
-    init(userName: String, noteDescription: String, coordinate: CLLocationCoordinate2D, type: String) {
+    init(id: String, userName: String, noteDescription: String, coordinate: CLLocationCoordinate2D, type: String) {
+        self.id = id
         self.userName = userName
         self.noteDescription = noteDescription
         self.coordinate = coordinate
@@ -28,16 +35,17 @@ class Note: NSObject, MKAnnotation {
     //will further implement into app once ive added a database
     //Expecting [<username>,<noteDescription>,<latitude>,<longitude>, <type>]
     init?(json: [Any]) {
-        self.userName = json[0] as? String ?? ""
-        self.noteDescription = json[1] as! String
+        self.id = json[0] as! String
+        self.userName = json[1] as? String ?? ""
+        self.noteDescription = json[2] as! String
         
-        if let latitude = Double(json[2] as! String),let longitude = Double(json[3] as! String) {
+        if let latitude = Double(json[3] as! String),let longitude = Double(json[4] as! String) {
             self.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         } else {
             self.coordinate = CLLocationCoordinate2D()
         }
         
-        self.type = json[4] as! String
+        self.type = json[5] as! String
     }
     
     var title: String? {

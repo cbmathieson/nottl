@@ -34,8 +34,8 @@ class GPSViewController: UIViewController {
         //add observer for checking location services when entering foreground
         NotificationCenter.default.addObserver(self, selector: #selector(updateMapWithoutAnimation), name: UIApplication.willEnterForegroundNotification, object: nil)
         
-        //implements custom annoatation
-        mapView.register(NoteMarkerView.self,forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
+        //implements custom annotation
+       mapView.register(NoteMarkerView.self,forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         //adding notes for map
         loadInitialData()
         pickupRegionOverlay()
@@ -67,15 +67,16 @@ class GPSViewController: UIViewController {
     
     //will load data from database but right now we just loading in tests
     func loadInitialData() {
-        let newNotes = [["?","skeet","48.4851970875","-123.3252241625","?"],["bong?","skeet","48.4801970875","-123.3252241620","user"],["craiigg","skeet","48.4751970875","-123.3252241620","read"],["crag","skeet","48.4851970870","-123.3352241625","user"],["eric","skeet","48.4851970879","-123.3152241627","user"], ["sket","test","48.46205995","-123.31141980604804","user"]]
+        let newNotes = [["00000001","?","skeet","48.4851970875","-123.3252241625","?"],["00000002","bong?","skeet","48.4801970875","-123.3252241620","user"],["00000003","craiigg","skeet","48.4751970875","-123.3252241620","read"],["00000004","crag","skeet","48.4851970870","-123.3352241625","user"],["00000005","eric","skeet","48.4851970879","-123.3152241627","user"], ["00000006","sket","test","48.46205995","-123.31141980604804","user"], ["00000007","paige","test","48.46369387570571","-123.30975823961442", "user"]]
         let validGoods = newNotes.compactMap { Note(json: $0) }
         notes.append(contentsOf: validGoods)
     }
     
+    //adds 50m radius circle around annotations for visual representation
     func pickupRegionOverlay(){
         for note in notes {
             let center = note.coordinate
-            let circle = MKCircle(center: center, radius: 150.0)
+            let circle = MKCircle(center: center, radius: 50.0)
             mapView.addOverlay(circle)
         }
     }
@@ -132,38 +133,61 @@ extension GPSViewController: MKMapViewDelegate {
         let circleRenderer = MKCircleRenderer(overlay: overlay)
         circleRenderer.fillColor = UIColor.lightGray.withAlphaComponent(0.5)
         circleRenderer.strokeColor = UIColor.red
-        circleRenderer.lineWidth = 3
-        circleRenderer.lineDashPattern = [6,12]
-        circleRenderer.lineJoin = .miter
+        circleRenderer.lineWidth = 0.1
         return circleRenderer
     }
     
-
+    //still fucking broken
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if let view = annotation as? MKUserLocation {
+            view.title = ""
+            return nil
+        }
+ 
+        let annotationView = NoteMarkerView(annotation: annotation, reuseIdentifier: "note")
+        annotationView.canShowCallout = inRange(annotation: annotation)
+        return annotationView
+    }
     
-    
-    //Gonna use this later for placing around notes @ passed location
-    /*
-     func addNoteCircle(location: CLLocation) {
-     let circle = MKCircle(center: location.coordinate, radius: 50 as CLLocationDistance)
-     mapView.addOverlay(circle)
-     }
-     */
-    
-    //defines overlay to be placed a pickup region
-    //Gonnna use this later for placing around notes dropped
-    /*
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if overlay is MKCircle {
-            let circle = MKCircleRenderer(overlay: overlay)
-            circle.strokeColor = UIColor.init(red: 169/255,green: 103/255,blue: 90/255,alpha: 1.0)
-            circle.fillColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.1)
-            circle.lineWidth = 1
-            
-            return circle
-        } else {
-            //only way to silence warning for delegate method. Would normally return nil and use optionals, but it is messed up
-            return MKPolylineRenderer()
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        if let annotation = view.annotation {
+            if let view = annotation as? MKUserLocation {
+                view.title = ""
+            } else {
+                if inRange(annotation: annotation) {
+                    view.canShowCallout = true
+                } else {
+                    mapView.deselectAnnotation(annotation, animated: false)
+                    view.canShowCallout = false
+                }
+            }
         }
     }
-    */
+    
+    //checks to see if user is in note's area
+    //Uses the Haversine Formula to find distance between note and user
+    func inRange(annotation: MKAnnotation) -> Bool {
+        let annotationLatitude = annotation.coordinate.latitude
+        let annotationLongitude = annotation.coordinate.longitude
+        
+        let userLatitude = locationManager.location!.coordinate.latitude
+        let userLongitude = locationManager.location!.coordinate.longitude
+        
+        //setup for haversine formula
+        let earthsRadius: Double = 6371000.0 //in metres
+        let aLatRadians = annotationLatitude * (.pi/180)
+        let uLatRadians = userLatitude * (.pi/180)
+        let latDifference = abs((annotationLatitude - userLatitude) * (.pi/180))
+        let longDifference = abs((annotationLongitude - userLongitude) * (.pi/180))
+        
+        //Haversine formula
+        let a = sin(latDifference/2) * sin(latDifference/2)
+        let b = cos(aLatRadians) * cos(uLatRadians) * sin(longDifference/2) * sin(longDifference/2)
+        let c = a + b
+        let d = 2 * atan2(sqrt(c), sqrt(1-c))
+        let difference = earthsRadius * d
+        
+        //check if user within 50m
+        return difference < 50.0
+    }
 }
