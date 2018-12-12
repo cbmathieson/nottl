@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2110318F218EABE500CB99FF /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110318E218EABE500CB99FF /* Note.swift */; };
 		21103191218FD91700CB99FF /* NoteMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21103190218FD91700CB99FF /* NoteMarkerView.swift */; };
+		21789ACC21C105C4005355A1 /* textField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789ACB21C105C4005355A1 /* textField.swift */; };
+		21789AD021C11188005355A1 /* NewNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789ACF21C11188005355A1 /* NewNoteViewController.swift */; };
 		218CC64B216BF5AB00E6BE20 /* GPSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */; };
 		218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC650216C509300E6BE20 /* TabBarViewController.swift */; };
 		218CC653216C59C800E6BE20 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC652216C59C800E6BE20 /* ProfileViewController.swift */; };
@@ -24,6 +26,8 @@
 /* Begin PBXFileReference section */
 		2110318E218EABE500CB99FF /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		21103190218FD91700CB99FF /* NoteMarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteMarkerView.swift; sourceTree = "<group>"; };
+		21789ACB21C105C4005355A1 /* textField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = textField.swift; sourceTree = "<group>"; };
+		21789ACF21C11188005355A1 /* NewNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewNoteViewController.swift; sourceTree = "<group>"; };
 		218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSViewController.swift; sourceTree = "<group>"; };
 		218CC650216C509300E6BE20 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		218CC652216C59C800E6BE20 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
@@ -58,6 +62,23 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		21789ACD21C1060F005355A1 /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				21789ACB21C105C4005355A1 /* textField.swift */,
+			);
+			path = extensions;
+			sourceTree = "<group>";
+		};
+		21789ACE21C1115F005355A1 /* GPS controller */ = {
+			isa = PBXGroup;
+			children = (
+				218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */,
+				21789ACF21C11188005355A1 /* NewNoteViewController.swift */,
+			);
+			path = "GPS controller";
+			sourceTree = "<group>";
+		};
 		218CC64E216C4D6E00E6BE20 /* Setup Pages */ = {
 			isa = PBXGroup;
 			children = (
@@ -72,7 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				218CC650216C509300E6BE20 /* TabBarViewController.swift */,
-				218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */,
+				21789ACE21C1115F005355A1 /* GPS controller */,
 				218CC652216C59C800E6BE20 /* ProfileViewController.swift */,
 			);
 			path = TabBarController;
@@ -101,6 +122,7 @@
 				21B87855215C0BC400B48CF1 /* AppDelegate.swift */,
 				21B87859215C0BC400B48CF1 /* Main.storyboard */,
 				21F45B222166948B00849617 /* View */,
+				21789ACD21C1060F005355A1 /* extensions */,
 				21B8785C215C0BC700B48CF1 /* Assets.xcassets */,
 				21B8785E215C0BC700B48CF1 /* LaunchScreen.storyboard */,
 				21B87861215C0BC700B48CF1 /* Info.plist */,
@@ -189,12 +211,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				21F45B1D216540A100849617 /* LogInViewController.swift in Sources */,
+				21789ACC21C105C4005355A1 /* textField.swift in Sources */,
 				218CC64B216BF5AB00E6BE20 /* GPSViewController.swift in Sources */,
 				21F45B1B2165408C00849617 /* CreateAccountViewController.swift in Sources */,
 				2110318F218EABE500CB99FF /* Note.swift in Sources */,
 				21B87856215C0BC400B48CF1 /* AppDelegate.swift in Sources */,
 				218CC653216C59C800E6BE20 /* ProfileViewController.swift in Sources */,
 				218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */,
+				21789AD021C11188005355A1 /* NewNoteViewController.swift in Sources */,
 				21F45B2121654C2800849617 /* InitialViewController.swift in Sources */,
 				21103191218FD91700CB99FF /* NoteMarkerView.swift in Sources */,
 			);

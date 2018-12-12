@@ -15,8 +15,17 @@ class NoteMarkerView: MKMarkerAnnotationView {
         willSet {
             guard let note = newValue as? Note else { return }
             calloutOffset = CGPoint(x: -5, y: 5)
-            rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
-
+            let noteButton = UIButton(frame: CGRect(origin: CGPoint.zero,size: CGSize(width: 30, height: 30)))
+            
+            noteButton.setBackgroundImage(UIImage(named: "account_icon"), for: UIControl.State())
+            rightCalloutAccessoryView = noteButton
+            
+            let noteLabel = UILabel()
+            noteLabel.numberOfLines = 0
+            noteLabel.font = noteLabel.font.withSize(12)
+            noteLabel.text = note.subtitle
+            detailCalloutAccessoryView = noteLabel
+            
             markerTintColor = note.markerTintColor
             glyphText = String(note.userName.first!)
         }

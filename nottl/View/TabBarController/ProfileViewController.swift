@@ -15,9 +15,12 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let red = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
+        
         profileImageView.layer.cornerRadius = 37.5
         profileImageView.layer.masksToBounds = true
+        profileImageView.layer.borderColor = red.cgColor
+        profileImageView.layer.borderWidth = 2.0
         
-        // Do any additional setup after loading the view.
     }
 }

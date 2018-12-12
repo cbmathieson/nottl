@@ -35,7 +35,7 @@ class GPSViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateMapWithoutAnimation), name: UIApplication.willEnterForegroundNotification, object: nil)
         
         //implements custom annotation
-       mapView.register(NoteMarkerView.self,forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
+        mapView.register(NoteMarkerView.self,forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         //adding notes for map
         loadInitialData()
         pickupRegionOverlay()
@@ -67,7 +67,7 @@ class GPSViewController: UIViewController {
     
     //will load data from database but right now we just loading in tests
     func loadInitialData() {
-        let newNotes = [["00000001","?","skeet","48.4851970875","-123.3252241625","?"],["00000002","bong?","skeet","48.4801970875","-123.3252241620","user"],["00000003","craiigg","skeet","48.4751970875","-123.3252241620","read"],["00000004","crag","skeet","48.4851970870","-123.3352241625","user"],["00000005","eric","skeet","48.4851970879","-123.3152241627","user"], ["00000006","sket","test","48.46205995","-123.31141980604804","user"], ["00000007","paige","test","48.46369387570571","-123.30975823961442", "user"]]
+        let newNotes = [["00000001","?","We just out here gettin dis bred ","48.4851970875","-123.3252241625","?"],["00000002","bong?","skeet","48.4801970875","-123.3252241620","user"],["00000003","craiigg","skeet","48.4751970875","-123.3252241620","read"],["00000004","crag","skeet","48.4851970870","-123.3352241625","user"],["00000005","eric","skeet","48.4851970879","-123.3152241627","user"], ["00000006","sket","test","48.46205995","-123.31141980604804","user"], ["00000007","paige","test","48.46369387570571","-123.30975823961442", "user"],["00000008","craigy boi","This is going to be such a great app, can't even believe how nice this sunrise is tho","48.48481","-123.32547", "user"],["00000009","home","back in kelowna","49.84888225706291","-119.613264284726", "user"]]
         let validGoods = newNotes.compactMap { Note(json: $0) }
         notes.append(contentsOf: validGoods)
     }
@@ -137,7 +137,7 @@ extension GPSViewController: MKMapViewDelegate {
         return circleRenderer
     }
     
-    //still fucking broken
+    //sets initial geofencing for notes when loaded
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if let view = annotation as? MKUserLocation {
             view.title = ""
@@ -149,6 +149,7 @@ extension GPSViewController: MKMapViewDelegate {
         return annotationView
     }
     
+    //rechecks if note is within distance when tapped
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let annotation = view.annotation {
             if let view = annotation as? MKUserLocation {
