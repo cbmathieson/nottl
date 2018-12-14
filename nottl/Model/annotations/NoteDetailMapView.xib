@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="NoteDetailMapView" customModule="nottl" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="280" height="164"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQQ-Xh-fA1">
+                    <rect key="frame" x="0.0" y="0.0" width="280" height="156"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="15"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </button>
+                <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2cE-vR-6Nd">
+                    <rect key="frame" x="114" y="8" width="50" height="50"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="50" id="nAM-yD-46j"/>
+                        <constraint firstAttribute="height" constant="50" id="xZc-AL-aUZ"/>
+                    </constraints>
+                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <state key="normal" image="account_icon">
+                        <color key="titleColor" red="0.70196078429999997" green="0.38823529410000002" blue="0.33725490200000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="imageSelected:" destination="iN0-l3-epB" eventType="touchUpInside" id="83s-64-7AW"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="craaaiiiggg" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5wp-xn-XFE">
+                    <rect key="frame" x="7" y="58" width="264" height="33"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="264" id="UuP-Uo-1gH"/>
+                        <constraint firstAttribute="height" constant="33" id="cjT-F4-eU0"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is a sweet description! big yeeeeeeeeeets" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qip-yd-fIB">
+                    <rect key="frame" x="42.5" y="91" width="195" height="36"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="195" id="JE4-wT-dAe"/>
+                        <constraint firstAttribute="height" constant="36" id="dIl-Qr-wZU"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
+                    <color key="textColor" red="0.28980004219653743" green="0.29045314656227555" blue="0.30041943104739122" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LeC-MQ-Zky" userLabel="User Count Button">
+                    <rect key="frame" x="89" y="130" width="100" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="bri-dl-WWj"/>
+                        <constraint firstAttribute="width" constant="100" id="mvK-tY-fxB"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="10"/>
+                    <state key="normal" title="Viewed by 69 users">
+                        <color key="titleColor" red="0.70196078429999997" green="0.38823529410000002" blue="0.33725490200000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="viewedBySelected:" destination="iN0-l3-epB" eventType="touchUpInside" id="DNK-Le-Czg"/>
+                    </connections>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstItem="5wp-xn-XFE" firstAttribute="top" secondItem="2cE-vR-6Nd" secondAttribute="bottom" id="2gn-ml-Plc"/>
+                <constraint firstItem="SQQ-Xh-fA1" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="8o0-3a-M9u"/>
+                <constraint firstItem="qip-yd-fIB" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Aa9-s6-d0e"/>
+                <constraint firstItem="5wp-xn-XFE" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-1" id="IdN-0N-EoJ"/>
+                <constraint firstItem="SQQ-Xh-fA1" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="LPX-7r-mwb"/>
+                <constraint firstItem="SQQ-Xh-fA1" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="N8j-mD-dq0"/>
+                <constraint firstItem="SQQ-Xh-fA1" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" constant="-8" id="P8f-lw-tCc"/>
+                <constraint firstItem="LeC-MQ-Zky" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-1" id="Vtd-ta-JPq"/>
+                <constraint firstItem="LeC-MQ-Zky" firstAttribute="top" secondItem="qip-yd-fIB" secondAttribute="bottom" constant="3" id="lxU-Fj-uNK"/>
+                <constraint firstItem="2cE-vR-6Nd" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-1" id="s2f-6H-2Ny"/>
+                <constraint firstItem="qip-yd-fIB" firstAttribute="top" secondItem="5wp-xn-XFE" secondAttribute="bottom" id="v8i-LB-ZIW"/>
+                <constraint firstItem="2cE-vR-6Nd" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="8" id="wt2-z7-rj6"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="backgroundContentButton" destination="SQQ-Xh-fA1" id="1jC-GX-uj1"/>
+                <outlet property="descriptionLabel" destination="qip-yd-fIB" id="vvQ-Ag-1Cr"/>
+                <outlet property="imageButton" destination="2cE-vR-6Nd" id="hNJ-md-hGl"/>
+                <outlet property="userCountButton" destination="LeC-MQ-Zky" id="Jp0-kq-r09"/>
+                <outlet property="userNameLabel" destination="5wp-xn-XFE" id="rTd-am-BUu"/>
+            </connections>
+            <point key="canvasLocation" x="764.79999999999995" y="-45.877061469265371"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="account_icon" width="25" height="25"/>
+    </resources>
+</document>

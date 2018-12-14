@@ -12,6 +12,12 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
 
     @IBOutlet weak var newImageView: UIImageView!
     @IBOutlet weak var captionTextField: UITextField!
+    @IBOutlet weak var yesButton: UIButton!
+    @IBOutlet weak var noButton: UIButton!
+    
+    var isAnonymous = false
+    let nottlRed = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
+    let nottlGrey = UIColor(red: 199.0/255.0, green: 199.0/255.0, blue: 204.0/255.0, alpha: 1.0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +31,7 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         dismiss(animated: true, completion: nil)
     }
     
+    //called when user selects image icon; opens up imagepicker
     @IBAction func chooseImage(_ sender: Any) {
         
         let imagePickerController = UIImagePickerController()
@@ -56,6 +63,19 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         
     }
     
+    @IBAction func yesButtonPressed(_ sender: Any) {
+        isAnonymous = true
+        yesButton.setTitleColor(nottlRed, for: .normal)
+        noButton.setTitleColor(nottlGrey, for: .normal)
+    }
+    
+    @IBAction func noButtonPressed(_ sender: Any) {
+        isAnonymous = false
+        noButton.setTitleColor(nottlRed, for: .normal)
+        yesButton.setTitleColor(nottlGrey, for: .normal)
+    }
+    
+    //when image has been chosen in image picker, then we update UIImageView
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
         
@@ -64,6 +84,7 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         picker.dismiss(animated: true, completion: nil)
     }
     
+    //Dismiss image picker on cancel
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }

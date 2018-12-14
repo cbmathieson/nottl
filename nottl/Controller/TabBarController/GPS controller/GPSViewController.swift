@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-class GPSViewController: UIViewController {
+class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewDelegate {
     
     //Outlets
     @IBOutlet weak var FailedPermissionsView: UIView!
@@ -17,10 +17,15 @@ class GPSViewController: UIViewController {
     
     //Variables
     var locationManager = CLLocationManager()
-    var notes: [Note] = []
     //Global variables
     var isAnimated = false
     var zoomIn = false
+    var selectedNote: Note?
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNotesInMap()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,13 +38,6 @@ class GPSViewController: UIViewController {
         
         //add observer for checking location services when entering foreground
         NotificationCenter.default.addObserver(self, selector: #selector(updateMapWithoutAnimation), name: UIApplication.willEnterForegroundNotification, object: nil)
-        
-        //implements custom annotation
-        mapView.register(NoteMarkerView.self,forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
-        //adding notes for map
-        loadInitialData()
-        pickupRegionOverlay()
-        mapView.addAnnotations(notes)
         
     }
     
@@ -65,21 +63,124 @@ class GPSViewController: UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    //will load data from database but right now we just loading in tests
-    func loadInitialData() {
-        let newNotes = [["00000001","?","We just out here gettin dis bred ","48.4851970875","-123.3252241625","?"],["00000002","bong?","skeet","48.4801970875","-123.3252241620","user"],["00000003","craiigg","skeet","48.4751970875","-123.3252241620","read"],["00000004","crag","skeet","48.4851970870","-123.3352241625","user"],["00000005","eric","skeet","48.4851970879","-123.3152241627","user"], ["00000006","sket","test","48.46205995","-123.31141980604804","user"], ["00000007","paige","test","48.46369387570571","-123.30975823961442", "user"],["00000008","craigy boi","This is going to be such a great app, can't even believe how nice this sunrise is tho","48.48481","-123.32547", "user"],["00000009","home","back in kelowna","49.84888225706291","-119.613264284726", "user"]]
-        let validGoods = newNotes.compactMap { Note(json: $0) }
-        notes.append(contentsOf: validGoods)
+    //add singleton testing notes
+    func configureNotesInMap() {
+        var annotations = [MKAnnotation]()
+        for note in NoteManager.sharedInstance.notes {
+            let annotation = NoteAnnotation(note: note)
+            annotations.append(annotation)
+        }
+        mapView.removeAnnotations(mapView.annotations)
+        mapView.addAnnotations(annotations)
     }
     
-    //adds 50m radius circle around annotations for visual representation
-    func pickupRegionOverlay(){
-        for note in notes {
-            let center = note.coordinate
-            let circle = MKCircle(center: center, radius: 50.0)
-            mapView.addOverlay(circle)
+    //MKMapViewDelegate methods
+    
+    //Builds overlay circle for visual representation of note pick up area
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        let circleRenderer = MKCircleRenderer(overlay: overlay)
+        circleRenderer.fillColor = UIColor.lightGray.withAlphaComponent(0.5)
+        circleRenderer.strokeColor = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
+        circleRenderer.lineWidth = 0.5
+        return circleRenderer
+    }
+    
+    //sets initial geofencing for notes when loaded
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        if let view = annotation as? MKUserLocation {
+            view.title = ""
+            return nil
+        }
+        
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "note")
+        
+        if annotationView == nil {
+            annotationView = NoteAnnotationView(annotation: annotation, reuseIdentifier: "note")
+            (annotationView as! NoteAnnotationView).noteDetailDelegate = self
+        } else {
+            annotationView!.annotation = annotation
+        }
+        
+        addOverlay(annotation: annotation)
+        annotationView?.isEnabled = inRange(annotation: annotation)
+        return annotationView
+    }
+    
+    //rechecks if note is within distance when tapped
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        if let annotation = view.annotation {
+            if let view = annotation as? MKUserLocation {
+                view.title = ""
+            } else {
+                if inRange(annotation: annotation) {
+                    view.isEnabled = true
+                } else {
+                    mapView.deselectAnnotation(annotation, animated: false)
+                    view.isEnabled = false
+                }
+            }
         }
     }
+    
+    //checks to see if user is in note's area
+    //Uses Haversine Formula to find distance between note and user
+    func inRange(annotation: MKAnnotation) -> Bool {
+        let annotationLatitude = annotation.coordinate.latitude
+        let annotationLongitude = annotation.coordinate.longitude
+        
+        let userLatitude = locationManager.location!.coordinate.latitude
+        let userLongitude = locationManager.location!.coordinate.longitude
+        
+        //setup for haversine formula
+        let earthsRadius: Double = 6371000.0 //in metres
+        let aLatRadians = annotationLatitude * (.pi/180)
+        let uLatRadians = userLatitude * (.pi/180)
+        let latDifference = abs((annotationLatitude - userLatitude) * (.pi/180))
+        let longDifference = abs((annotationLongitude - userLongitude) * (.pi/180))
+        
+        //Haversine formula
+        let a = sin(latDifference/2) * sin(latDifference/2)
+        let b = cos(aLatRadians) * cos(uLatRadians) * sin(longDifference/2) * sin(longDifference/2)
+        let c = a + b
+        let d = 2 * atan2(sqrt(c), sqrt(1-c))
+        let difference = earthsRadius * d
+        
+        //check if user within 50m
+        return difference < 50.0
+    }
+    
+    func addOverlay(annotation: MKAnnotation) {
+        let center = annotation.coordinate
+        let circle = MKCircle(center: center, radius: 50.0)
+        mapView.addOverlay(circle)
+    }
+    
+    //selecting note and segue to new view
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        /*if segue.identifier == "imageDetails" {
+            if let vc = segue.destination as? NoteDetailsViewController {
+                vc.note = self.selectedNote
+            }
+        } else if segue.identifier == "viewedBy" {
+            if let vc = segue.destination as? SeenByViewController {
+                vc.note = self.selectedNote
+            }
+        }*/
+    }
+    
+    //if avatar image is selected: run segue to fullscreen image
+    func detailsRequestedForNote(note: Note) {
+        self.selectedNote = note
+        self.performSegue(withIdentifier: "imageDetails", sender: nil)
+    }
+    
+    //if user selects "viewed by..." run segue to tableview of users
+    func detailsRequestedForSeenBy(note: Note) {
+        self.selectedNote = note
+        self.performSegue(withIdentifier: "viewedBy", sender: nil)
+    }
+ 
     
 }
 
@@ -122,73 +223,5 @@ extension GPSViewController: CLLocationManagerDelegate {
         }
         zoomIn = false
         locationManager.stopUpdatingLocation()
-    }
-}
-
-extension GPSViewController: MKMapViewDelegate {
-    
-    //Builds overlay circle for visual representation of note pick up area
-    
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        let circleRenderer = MKCircleRenderer(overlay: overlay)
-        circleRenderer.fillColor = UIColor.lightGray.withAlphaComponent(0.5)
-        circleRenderer.strokeColor = UIColor.red
-        circleRenderer.lineWidth = 0.1
-        return circleRenderer
-    }
-    
-    //sets initial geofencing for notes when loaded
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if let view = annotation as? MKUserLocation {
-            view.title = ""
-            return nil
-        }
- 
-        let annotationView = NoteMarkerView(annotation: annotation, reuseIdentifier: "note")
-        annotationView.canShowCallout = inRange(annotation: annotation)
-        return annotationView
-    }
-    
-    //rechecks if note is within distance when tapped
-    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        if let annotation = view.annotation {
-            if let view = annotation as? MKUserLocation {
-                view.title = ""
-            } else {
-                if inRange(annotation: annotation) {
-                    view.canShowCallout = true
-                } else {
-                    mapView.deselectAnnotation(annotation, animated: false)
-                    view.canShowCallout = false
-                }
-            }
-        }
-    }
-    
-    //checks to see if user is in note's area
-    //Uses the Haversine Formula to find distance between note and user
-    func inRange(annotation: MKAnnotation) -> Bool {
-        let annotationLatitude = annotation.coordinate.latitude
-        let annotationLongitude = annotation.coordinate.longitude
-        
-        let userLatitude = locationManager.location!.coordinate.latitude
-        let userLongitude = locationManager.location!.coordinate.longitude
-        
-        //setup for haversine formula
-        let earthsRadius: Double = 6371000.0 //in metres
-        let aLatRadians = annotationLatitude * (.pi/180)
-        let uLatRadians = userLatitude * (.pi/180)
-        let latDifference = abs((annotationLatitude - userLatitude) * (.pi/180))
-        let longDifference = abs((annotationLongitude - userLongitude) * (.pi/180))
-        
-        //Haversine formula
-        let a = sin(latDifference/2) * sin(latDifference/2)
-        let b = cos(aLatRadians) * cos(uLatRadians) * sin(longDifference/2) * sin(longDifference/2)
-        let c = a + b
-        let d = 2 * atan2(sqrt(c), sqrt(1-c))
-        let difference = earthsRadius * d
-        
-        //check if user within 50m
-        return difference < 50.0
     }
 }
