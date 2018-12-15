@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ModalDelegate {
+    func addNote(image: UIImage?, caption: String?, isAnonymous: Bool)
+}
+
 class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var newImageView: UIImageView!
@@ -15,6 +19,7 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet weak var noButton: UIButton!
     
+    var delegate:ModalDelegate!
     var isAnonymous = false
     let nottlRed = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
     let nottlGrey = UIColor(red: 199.0/255.0, green: 199.0/255.0, blue: 204.0/255.0, alpha: 1.0)
@@ -94,5 +99,10 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         self.view.endEditing(true)
         return false
     }
-
+    
+    //when share button is pressed, sends data to parent view to deal with
+    @IBAction func shareButtonPressed(_ sender: UIButton) {
+        delegate?.addNote(image: newImageView.image, caption: captionTextField.text, isAnonymous: isAnonymous)
+        self.dismiss(animated: true, completion: nil)
+    }
 }

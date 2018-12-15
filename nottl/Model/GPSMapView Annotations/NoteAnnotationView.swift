@@ -95,6 +95,7 @@ class NoteAnnotationView: MKAnnotationView {
         self.customCalloutView?.removeFromSuperview()
     }
     
+    //passes hit recognition through mapview and into the NoteAnnotationView
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if let parentHitView = super.hitTest(point, with: event) {
             return parentHitView

@@ -77,7 +77,7 @@ class NoteDetailMapView: UIView {
             return result
         }
         
+        //makes sure callout is not delselected when anything but the buttons are selected
         return backgroundContentButton.hitTest(convert(point, to: backgroundContentButton), with: event)
- 
     }
 }

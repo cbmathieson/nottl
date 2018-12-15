@@ -18,6 +18,8 @@
 		218CC64B216BF5AB00E6BE20 /* GPSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */; };
 		218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC650216C509300E6BE20 /* TabBarViewController.swift */; };
 		218CC653216C59C800E6BE20 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218CC652216C59C800E6BE20 /* ProfileViewController.swift */; };
+		21B55CFC21C4765E0073D406 /* ImageDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B55CFB21C4765E0073D406 /* ImageDetailsViewController.swift */; };
+		21B55CFE21C47CBF0073D406 /* SeenByViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B55CFD21C47CBF0073D406 /* SeenByViewController.swift */; };
 		21B87856215C0BC400B48CF1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B87855215C0BC400B48CF1 /* AppDelegate.swift */; };
 		21B8785B215C0BC400B48CF1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21B87859215C0BC400B48CF1 /* Main.storyboard */; };
 		21B87860215C0BC700B48CF1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21B8785E215C0BC700B48CF1 /* LaunchScreen.storyboard */; };
@@ -39,6 +41,8 @@
 		218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSViewController.swift; sourceTree = "<group>"; };
 		218CC650216C509300E6BE20 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		218CC652216C59C800E6BE20 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		21B55CFB21C4765E0073D406 /* ImageDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDetailsViewController.swift; sourceTree = "<group>"; };
+		21B55CFD21C47CBF0073D406 /* SeenByViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeenByViewController.swift; sourceTree = "<group>"; };
 		21B87852215C0BC400B48CF1 /* nottl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nottl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21B87855215C0BC400B48CF1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		21B8785A215C0BC400B48CF1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -64,7 +68,7 @@
 		2110318D218EABBD00CB99FF /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				21789AD321C1EBA5005355A1 /* annotations */,
+				21789AD321C1EBA5005355A1 /* GPSMapView Annotations */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -80,23 +84,22 @@
 		21789ACE21C1115F005355A1 /* GPS controller */ = {
 			isa = PBXGroup;
 			children = (
+				21B55CFF21C47DE90073D406 /* Annotations */,
 				218CC64A216BF5AB00E6BE20 /* GPSViewController.swift */,
 				21789ACF21C11188005355A1 /* NewNoteViewController.swift */,
 			);
 			path = "GPS controller";
 			sourceTree = "<group>";
 		};
-		21789AD321C1EBA5005355A1 /* annotations */ = {
+		21789AD321C1EBA5005355A1 /* GPSMapView Annotations */ = {
 			isa = PBXGroup;
 			children = (
 				2110318E218EABE500CB99FF /* Note.swift */,
+				21789AD421C200DC005355A1 /* NoteManager.swift */,
 				21789AD621C23B8E005355A1 /* NoteAnnotation.swift */,
 				21789AD821C23EE6005355A1 /* NoteAnnotationView.swift */,
-				21789AD421C200DC005355A1 /* NoteManager.swift */,
-				21789ADA21C3170F005355A1 /* NoteDetailMapView.xib */,
-				21789ADC21C3177E005355A1 /* NoteDetailMapView.swift */,
 			);
-			path = annotations;
+			path = "GPSMapView Annotations";
 			sourceTree = "<group>";
 		};
 		218CC64E216C4D6E00E6BE20 /* Setup Pages */ = {
@@ -119,6 +122,35 @@
 			path = TabBarController;
 			sourceTree = "<group>";
 		};
+		21B55CFF21C47DE90073D406 /* Annotations */ = {
+			isa = PBXGroup;
+			children = (
+				21789ADA21C3170F005355A1 /* NoteDetailMapView.xib */,
+				21789ADC21C3177E005355A1 /* NoteDetailMapView.swift */,
+				21B55CFD21C47CBF0073D406 /* SeenByViewController.swift */,
+				21B55CFB21C4765E0073D406 /* ImageDetailsViewController.swift */,
+			);
+			path = Annotations;
+			sourceTree = "<group>";
+		};
+		21B55D0021C47E350073D406 /* Storyboard */ = {
+			isa = PBXGroup;
+			children = (
+				21B87859215C0BC400B48CF1 /* Main.storyboard */,
+				21B8785E215C0BC700B48CF1 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboard;
+			sourceTree = "<group>";
+		};
+		21B55D0121C47EA30073D406 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				21B87855215C0BC400B48CF1 /* AppDelegate.swift */,
+				21B8785C215C0BC700B48CF1 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		21B87849215C0BC400B48CF1 = {
 			isa = PBXGroup;
 			children = (
@@ -138,25 +170,23 @@
 		21B87854215C0BC400B48CF1 /* nottl */ = {
 			isa = PBXGroup;
 			children = (
-				21B87855215C0BC400B48CF1 /* AppDelegate.swift */,
 				2110318D218EABBD00CB99FF /* Model */,
-				21F45B222166948B00849617 /* Controller */,
+				21F45B222166948B00849617 /* Views+Controllers */,
+				21B55D0021C47E350073D406 /* Storyboard */,
+				21B55D0121C47EA30073D406 /* Resources */,
 				21789ACD21C1060F005355A1 /* extensions */,
-				21B8785C215C0BC700B48CF1 /* Assets.xcassets */,
-				21B87859215C0BC400B48CF1 /* Main.storyboard */,
-				21B8785E215C0BC700B48CF1 /* LaunchScreen.storyboard */,
 				21B87861215C0BC700B48CF1 /* Info.plist */,
 			);
 			path = nottl;
 			sourceTree = "<group>";
 		};
-		21F45B222166948B00849617 /* Controller */ = {
+		21F45B222166948B00849617 /* Views+Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				218CC64F216C4D8900E6BE20 /* TabBarController */,
 				218CC64E216C4D6E00E6BE20 /* Setup Pages */,
+				218CC64F216C4D8900E6BE20 /* TabBarController */,
 			);
-			path = Controller;
+			path = "Views+Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -240,6 +270,8 @@
 				21789AD921C23EE6005355A1 /* NoteAnnotationView.swift in Sources */,
 				218CC653216C59C800E6BE20 /* ProfileViewController.swift in Sources */,
 				218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */,
+				21B55CFC21C4765E0073D406 /* ImageDetailsViewController.swift in Sources */,
+				21B55CFE21C47CBF0073D406 /* SeenByViewController.swift in Sources */,
 				21789AD521C200DC005355A1 /* NoteManager.swift in Sources */,
 				21789AD021C11188005355A1 /* NewNoteViewController.swift in Sources */,
 				21F45B2121654C2800849617 /* InitialViewController.swift in Sources */,

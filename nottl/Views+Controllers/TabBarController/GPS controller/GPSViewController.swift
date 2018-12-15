@@ -9,7 +9,7 @@
 import UIKit
 import MapKit
 
-class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewDelegate {
+class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewDelegate, ModalDelegate {
     
     //Outlets
     @IBOutlet weak var FailedPermissionsView: UIView!
@@ -21,6 +21,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     var isAnimated = false
     var zoomIn = false
     var selectedNote: Note?
+    var notes = [Note]()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -63,10 +64,11 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         self.present(alertController, animated: true, completion: nil)
     }
     
-    //add singleton testing notes
+    //add notes currently in array
+    //will add a backend later to filter in relevant(nearby) notes
     func configureNotesInMap() {
         var annotations = [MKAnnotation]()
-        for note in NoteManager.sharedInstance.notes {
+        for note in notes {
             let annotation = NoteAnnotation(note: note)
             annotations.append(annotation)
         }
@@ -108,10 +110,11 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     }
     
     //rechecks if note is within distance when tapped
+    //and disables clicks on user location
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let annotation = view.annotation {
-            if let view = annotation as? MKUserLocation {
-                view.title = ""
+            if annotation is MKUserLocation {
+                view.isEnabled = false
             } else {
                 if inRange(annotation: annotation) {
                     view.isEnabled = true
@@ -158,15 +161,15 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     
     //selecting note and segue to new view
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        /*if segue.identifier == "imageDetails" {
-            if let vc = segue.destination as? NoteDetailsViewController {
+        if segue.identifier == "imageDetails" {
+            if let vc = segue.destination as? ImageDetailsViewController {
                 vc.note = self.selectedNote
             }
         } else if segue.identifier == "viewedBy" {
-            if let vc = segue.destination as? SeenByViewController {
+           if let vc = segue.destination as? SeenByViewController {
                 vc.note = self.selectedNote
-            }
-        }*/
+           }
+        }
     }
     
     //if avatar image is selected: run segue to fullscreen image
@@ -180,7 +183,25 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         self.selectedNote = note
         self.performSegue(withIdentifier: "viewedBy", sender: nil)
     }
- 
+    
+    
+    //when share button is pressed in NewNoteVC, form is passed here to create new note
+    //WILL ADD MORE DEPENDENT INFORMATION LATER ON, JUST WANT TO MAKE IT FUNCTIONAL RN 
+    var id = 0
+    func addNote(image: UIImage?, caption: String?, isAnonymous: Bool) {
+        let newNote = Note(id: id, userName: "craaiiiggg", avatar: UIImage(named: "IMG_0169")!, noteImage: image ?? UIImage(named: "doggo image")!, caption: caption ?? "", coordinate: locationManager.location!.coordinate, seenBy: ["The bois", "craig", "eric"], isAnonymous: isAnonymous)
+        id = id+1
+        notes.append(newNote)
+        let annotation = NoteAnnotation(note: newNote)
+        mapView.addAnnotation(annotation)
+    }
+    
+    @IBAction func newNoteButtonPressed(_ sender: Any) {
+        let newNoteVC = self.storyboard?.instantiateViewController(withIdentifier: "NewNoteViewController") as! NewNoteViewController
+        newNoteVC.delegate = self
+        self.present(newNoteVC, animated: true, completion: nil)
+    }
+    
     
 }
 

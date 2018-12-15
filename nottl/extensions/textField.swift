@@ -5,7 +5,7 @@
 //  Created by Craig Mathieson on 2018-12-12.
 //  Copyright © 2018 Craig Mathieson. All rights reserved.
 //
-//  Taken from stackoverflow answer: https://stackoverflow.com/questions/31363216/set-the-maximum-character-length-of-a-uitextfield-in-swift
+//
 
 import UIKit
 private var __maxLengths = [UITextField: Int]()
