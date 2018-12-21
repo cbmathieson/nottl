@@ -31,6 +31,8 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.definesPresentationContext = true
+        
         //initialize location settings
         locationManager.delegate = self
         mapView.delegate = self
@@ -163,6 +165,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "imageDetails" {
             if let vc = segue.destination as? ImageDetailsViewController {
+                vc.modalPresentationCapturesStatusBarAppearance = true
                 vc.note = self.selectedNote
             }
         } else if segue.identifier == "viewedBy" {
@@ -199,6 +202,9 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     @IBAction func newNoteButtonPressed(_ sender: Any) {
         let newNoteVC = self.storyboard?.instantiateViewController(withIdentifier: "NewNoteViewController") as! NewNoteViewController
         newNoteVC.delegate = self
+        
+        newNoteVC.modalPresentationStyle = .overFullScreen
+        newNoteVC.modalPresentationCapturesStatusBarAppearance = true
         self.present(newNoteVC, animated: true, completion: nil)
     }
     

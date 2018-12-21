@@ -8,11 +8,15 @@
 
 import UIKit
 
-class ImageDetailsViewController: UIViewController {
+class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
     
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var imagePreview: UIImageView!
+    @IBOutlet weak var imageViewButton: UIButton!
     @IBOutlet weak var caption: UILabel!
     @IBOutlet weak var avatarButton: UIButton!
+    @IBOutlet weak var imageFullscreen: UIImageView!
+    @IBOutlet weak var fullscreenScroll: UIScrollView!
+    @IBOutlet weak var contentCover: UIView!
     
     //removes status bar for fullscreen effect
     override var prefersStatusBarHidden: Bool { return true }
@@ -26,6 +30,22 @@ class ImageDetailsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //set scrollView for fullscreen image
+        self.fullscreenScroll.minimumZoomScale = 1.0;
+        self.fullscreenScroll.maximumZoomScale = 6.0;
+        self.fullscreenScroll.contentSize = self.imageFullscreen.frame.size;
+        self.fullscreenScroll.delegate = self;
+        
+        //add single tap recognizer to scrollview
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(fullImageDismissed))
+        singleTap.cancelsTouchesInView = false
+        singleTap.numberOfTapsRequired = 1
+        fullscreenScroll.addGestureRecognizer(singleTap)
+        
+        //add swipe to dismiss gesture recognizer
+        let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerHandler(_:)))
+        view.addGestureRecognizer(gestureRecognizer)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -38,9 +58,74 @@ class ImageDetailsViewController: UIViewController {
         avatarButton.layer.borderWidth = 2.0
         
         if note != nil {
-            imageView.image = note?.noteImage
+            imagePreview.image = note?.noteImage
+            imageFullscreen.image = note?.noteImage
             avatarButton.setImage(note?.avatar, for: .normal)
             caption.text = note?.caption
+        }
+    }
+    
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return self.imageFullscreen
+    }
+    
+    //presents fullscreen when image preview is selected by fading in
+    @IBAction func imagePreviewSelected(_ sender: Any) {
+        
+        fullscreenScroll.alpha = 0.0
+        contentCover.alpha = 0.0
+        fullscreenScroll.isHidden = false
+        contentCover.isHidden = false
+       
+        UIView.animate(withDuration: 0.3, delay: 0.0, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.fullscreenScroll.alpha = 1.0
+            self.contentCover.alpha = 1.0
+            self.imagePreview.alpha = 0.0
+        }, completion: { (value: Bool) in
+            self.imagePreview.isHidden = true
+        })
+    }
+    
+    //dismisses fullscreen image by fading out
+    @objc func fullImageDismissed() {
+        
+        imagePreview.isHidden = false
+        
+        UIView.animate(withDuration: 0.3, delay: 0.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
+            self.fullscreenScroll.alpha = 0.0
+            self.contentCover.alpha = 0.0
+            self.imagePreview.alpha = 1.0
+        }, completion: { (value: Bool) in
+            self.fullscreenScroll.isHidden = true
+            self.contentCover.isHidden = true
+        })
+    }
+    
+    var initialTouchPoint = CGPoint.zero
+    
+    @IBAction func panGestureRecognizerHandler(_ sender: UIPanGestureRecognizer) {
+        let touchPoint = sender.location(in: view?.window)
+        
+        switch sender.state {
+        case .began:
+            initialTouchPoint = touchPoint
+        case .changed:
+            if touchPoint.y > initialTouchPoint.y {
+                view.frame.origin.y = (touchPoint.y - initialTouchPoint.y)
+            }
+        case .ended, .cancelled:
+            if touchPoint.y - initialTouchPoint.y > 150 {
+                dismiss(animated: true, completion: nil)
+            } else {
+                UIView.animate(withDuration: 0.2, animations: {
+                    self.view.frame = CGRect(x: 0,
+                                             y: 0,
+                                             width: self.view.frame.size.width,
+                                             height: self.view.frame.size.height)
+                })
+            }
+        case .failed, .possible:
+            break
         }
     }
     
