@@ -9,26 +9,27 @@
 import Foundation
 import UIKit
 
-class CreateAccountViewController: UIViewController, UITextFieldDelegate {
+class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     @IBOutlet weak var newUserName: UITextField!
     @IBOutlet weak var newEmailAddress: UITextField!
     @IBOutlet weak var newPassword: UITextField!
-    @IBOutlet weak var confirmPassword: UITextField!
     @IBOutlet weak var inputErrorLabel: UILabel!
+    @IBOutlet weak var profileImageView: UIImageView!
+    @IBOutlet weak var imageSelectButton: UIButton!
     
     //brackets to go around incorrect text inputs
     @IBOutlet weak var userNameLeft: UILabel!
     @IBOutlet weak var userNameRight: UILabel!
     @IBOutlet weak var emailLeft: UILabel!
     @IBOutlet weak var emailRight: UILabel!
-    @IBOutlet weak var pass1Left: UILabel!
-    @IBOutlet weak var pass1Right: UILabel!
-    @IBOutlet weak var pass2Left: UILabel!
-    @IBOutlet weak var pass2Right: UILabel!
+    @IBOutlet weak var passwordLeft: UILabel!
+    @IBOutlet weak var passwordRight: UILabel!
     
     //removes status bar for fullscreen effect
     override var prefersStatusBarHidden: Bool { return true }
+    var imagePickerActivated = false
+    var imageChosen: UIImage? = nil
     
     var isKeyboardActive = false
     let nottlRed = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
@@ -40,7 +41,11 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
         self.newUserName.delegate = self
         self.newEmailAddress.delegate = self
         self.newPassword.delegate = self
-        self.confirmPassword.delegate = self
+        
+        profileImageView.layer.cornerRadius = 37.5
+        profileImageView.layer.masksToBounds = true
+        profileImageView.layer.borderColor = nottlRed.cgColor
+        profileImageView.layer.borderWidth = 2.0
         
         //add keyboard observers to adjust view
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
@@ -54,9 +59,13 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        //remove keyboard observers
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        if !imagePickerActivated {
+            //remove keyboard observers
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        } else {
+            imagePickerActivated = false
+        }
     }
     
     //resets view if keyboard leaves
@@ -72,7 +81,7 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
     //moves view up when keyboard is presented
     @objc func keyboardWillChange(notification: NSNotification) {
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            if newUserName.isFirstResponder || newEmailAddress.isFirstResponder || newPassword.isFirstResponder || confirmPassword.isFirstResponder {
+            if newUserName.isFirstResponder || newEmailAddress.isFirstResponder || newPassword.isFirstResponder {
                 self.view.frame.origin.y = -keyboardSize.height/2
             }
         }
@@ -81,15 +90,12 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
     
     //moves textfields after next is pressed or sends data if last textfield
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == confirmPassword {
-            confirmPassword.resignFirstResponder()
-            createAccount(nil)
-        } else if textField == newUserName {
+        if textField == newUserName {
             newEmailAddress.becomeFirstResponder()
         } else if textField == newEmailAddress {
             newPassword.becomeFirstResponder()
         } else if textField == newPassword {
-            confirmPassword.becomeFirstResponder()
+            createAccount(nil)
         }
         return true
     }
@@ -98,17 +104,70 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
         dismiss(animated: true, completion: nil)
     }
     
+    @IBAction func selectImageButtonPressed(_ sender: Any) {
+        imagePickerActivated = true
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.allowsEditing = true
+        imagePickerController.modalPresentationStyle = .overCurrentContext
+        
+        //makes user choose photos or camera as source
+        let actionSheet = UIAlertController(title: "Note Image", message: "Choose a source", preferredStyle: .actionSheet)
+        
+        //camera option
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { (action: UIAlertAction) in
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                imagePickerController.sourceType = .camera
+                self.present(imagePickerController, animated: true, completion: nil)
+            } else {
+                print("Camera not available")
+            }
+        }))
+        
+        //photos option
+        actionSheet.addAction(UIAlertAction(title: "Photos", style: .default, handler: { (action: UIAlertAction) in
+            imagePickerController.sourceType = .photoLibrary
+            self.present(imagePickerController, animated: true, completion: nil)
+        }))
+        
+        //cancel button
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+        
+        self.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+            profileImageView.image = image
+            imageSelectButton.setTitle("", for: .normal)
+            imageChosen = image
+        } else if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            profileImageView.image = image
+            imageSelectButton.setTitle("", for: .normal)
+            imageChosen = image
+        } else {
+            print("something went wrong :(")
+        }
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
     @IBAction func createAccount(_ sender: Any?) {
-        //once database is setup: will implement
         self.view.window?.endEditing(true)
-        if checkInputs(username: newUserName.text, email: newEmailAddress.text, password: newPassword.text, password2: confirmPassword.text) {
-            //send data
+        if startRegistration(username: newUserName.text, email: newEmailAddress.text, password: newPassword.text) {
             performSegue(withIdentifier: "createAccountSegue", sender: nil)
+        } else {
+            inputErrorLabel.text = "could not complete registration :("
+            inputErrorLabel.isHidden = false
         }
     }
     
     //checks validity of values passed
-    func checkInputs(username: String?, email: String?, password: String?, password2: String?) -> Bool {
+    func startRegistration(username: String?, email: String?, password: String?) -> Bool {
         
         //reset input error indicators
         inputErrorLabel.isHidden = true
@@ -117,19 +176,17 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
         userNameRight.isHidden = true
         emailLeft.isHidden = true
         emailRight.isHidden = true
-        pass1Left.isHidden = true
-        pass1Right.isHidden = true
-        pass2Left.isHidden = true
-        pass2Right.isHidden = true
+        passwordRight.isHidden = true
+        passwordLeft.isHidden = true
 
-        guard let usrName = username, let eml = email, let pass = password, let pass2 = password2 else {
+        guard let usrName = username, let eml = email, let pass = password else {
             inputErrorLabel.text = "something went wrong :("
             inputErrorLabel.isHidden = false
             return false
         }
 
-        if !usrName.matches("\\w+$"){
-            inputErrorLabel.text = "numbers, letters, and _ only"
+        if !usrName.matches("^\\w+$") {
+            inputErrorLabel.text = "numbers, letters, _ only"
             inputErrorLabel.isHidden = false
             userNameLeft.isHidden = false
             userNameRight.isHidden = false
@@ -155,22 +212,37 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
         }
         
         if pass.count < 8 {
-            inputErrorLabel.text = "give it at least 8 characers"
+            passwordLeft.isHidden = false
+            passwordRight.isHidden = false
+            inputErrorLabel.text = "Give it at least 8 characters"
             inputErrorLabel.isHidden = false
-            pass1Left.isHidden = false
-            pass1Right.isHidden = false
             return false
         }
         
-        //check if values are what we want from the user
-        if pass != pass2 {
-            inputErrorLabel.text = "passwords must match"
+        guard var image = imageChosen else {
+            inputErrorLabel.text = "please select a profile image"
             inputErrorLabel.isHidden = false
-            pass2Left.isHidden = false
-            pass2Right.isHidden = false
             return false
         }
-        return true
+        
+        //make image 75*75
+        image = image.imageWith(newSize: CGSize(width: 75, height: 75))
+        
+        var registrationSuccess = true
+
+        AuthService.instance.registerUser(withEmail: eml, andPassword: pass, username: usrName, profileImage: image, userCreationCompleted: { (success, registrationError) in
+            if success {
+                AuthService.instance.loginUser(withEmail: eml, andPassword: pass, loginCompleted: { (success, nil) in
+                    if !AuthService.instance.sendEmailVerification() {
+                        registrationSuccess = false
+                    }
+                })
+            } else {
+                print(String(describing: registrationError?.localizedDescription))
+                registrationSuccess = false
+            }
+        })
+        return registrationSuccess
     }
     
     var initialTouchPoint = CGPoint.zero
@@ -186,7 +258,10 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
                 view.frame.origin.y = (touchPoint.y - initialTouchPoint.y)
             }
         case .ended, .cancelled:
-            if touchPoint.y - initialTouchPoint.y > 150 {
+            
+            let velocity = sender.velocity(in: view).y
+            
+            if touchPoint.y - initialTouchPoint.y > 150 || velocity > 1000 {
                 dismiss(animated: true, completion: nil)
             } else {
                 UIView.animate(withDuration: 0.2, animations: {
@@ -201,10 +276,4 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-}
-
-extension String {
-    func matches(_ regex: String) -> Bool {
-        return self.range(of: regex, options: .regularExpression, range: nil, locale: nil) != nil
-    }
 }

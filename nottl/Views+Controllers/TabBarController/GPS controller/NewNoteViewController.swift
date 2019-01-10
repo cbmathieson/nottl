@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 protocol ModalDelegate {
     func addNote(image: UIImage?, caption: String?, isAnonymous: Bool)
@@ -25,6 +26,7 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet weak var noButton: UIButton!
     
+    var imageChosen: UIImage?
     var imagepickerActivated = false
     var delegate:ModalDelegate!
     var isAnonymous = false
@@ -42,8 +44,6 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerHandler(_:)))
         view.addGestureRecognizer(gestureRecognizer)
-        
-        statusBarHeight = getStatusBarHeight()
     
     }
     
@@ -51,12 +51,10 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         super.viewWillDisappear(animated)
         
         if !imagepickerActivated {
-            print("this is a view leaving")
             //remove keyboard observers
             NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
             NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         } else {
-            print("this is image Picker")
             imagepickerActivated = false
         }
     }
@@ -90,6 +88,7 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         imagepickerActivated = true
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
+        imagePickerController.modalPresentationStyle = .overCurrentContext
         
         //makes user choose photos or camera as source
         let actionSheet = UIAlertController(title: "Note Image", message: "Choose a source", preferredStyle: .actionSheet)
@@ -131,12 +130,17 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
     
     //when image has been chosen in image picker, then we update UIImageView
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
         
-        newImageView.image = image
-        imgButton.isEnabled = false
-        topLeftImageButton.isHidden = false
+        picker.delegate = self
         
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            newImageView.image = image
+            imgButton.isEnabled = false
+            topLeftImageButton.isHidden = false
+            imageChosen = image
+        } else {
+            print("something went wrong")
+        }
         picker.dismiss(animated: true, completion: nil)
     }
     
@@ -161,16 +165,8 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         }
     }
     
-    //gets height of status bar to account when swiping down to dismiss
-    func getStatusBarHeight() -> CGFloat {
-        //gets actual height of frame since status bar is present
-        let statusBarSize = UIApplication.shared.statusBarFrame.size
-        return Swift.min(statusBarSize.width, statusBarSize.height)
-    }
-    
     //dismiss view when swiped down
     var initialTouchPoint = CGPoint.zero
-    var statusBarHeight: CGFloat = 0.0
     
     @IBAction func panGestureRecognizerHandler(_ sender: UIPanGestureRecognizer) {
         let touchPoint = sender.location(in: view?.window)
@@ -183,14 +179,13 @@ class NewNoteViewController: UIViewController, UITextFieldDelegate, UIImagePicke
                 view.frame.origin.y = (touchPoint.y - initialTouchPoint.y)
             }
         case .ended, .cancelled:
-            if touchPoint.y - initialTouchPoint.y > 150 {
+            let velocity = sender.velocity(in: view).y
+            
+            if touchPoint.y - initialTouchPoint.y > 150 || velocity > 1000 {
                 dismiss(animated: true, completion: nil)
             } else {
                 UIView.animate(withDuration: 0.2, animations: {
-                    self.view.frame = CGRect(x: 0,
-                                             y: 0,
-                                             width: self.view.frame.size.width,
-                                             height: self.view.frame.size.height)
+                    self.view.frame = CGRect(x: 0,y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
                 })
             }
         case .failed, .possible:

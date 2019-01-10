@@ -104,6 +104,9 @@ class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
     var initialTouchPoint = CGPoint.zero
     
     @IBAction func panGestureRecognizerHandler(_ sender: UIPanGestureRecognizer) {
+        if imagePreview.isHidden == true {
+            return
+        }
         let touchPoint = sender.location(in: view?.window)
         
         switch sender.state {

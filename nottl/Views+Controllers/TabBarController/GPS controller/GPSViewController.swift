@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import Firebase
 
 class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewDelegate, ModalDelegate {
     
@@ -41,7 +42,6 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         
         //add observer for checking location services when entering foreground
         NotificationCenter.default.addObserver(self, selector: #selector(updateMapWithoutAnimation), name: UIApplication.willEnterForegroundNotification, object: nil)
-        
     }
     
     //Functions
@@ -189,14 +189,56 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     
     
     //when share button is pressed in NewNoteVC, form is passed here to create new note
-    //WILL ADD MORE DEPENDENT INFORMATION LATER ON, JUST WANT TO MAKE IT FUNCTIONAL RN 
-    var id = 0
+    //WILL ADD MORE DEPENDENT INFORMATION LATER ON, JUST WANT TO MAKE IT FUNCTIONAL RN
     func addNote(image: UIImage?, caption: String?, isAnonymous: Bool) {
-        let newNote = Note(id: id, userName: "craaiiiggg", avatar: UIImage(named: "IMG_0169")!, noteImage: image ?? UIImage(named: "doggo image")!, caption: caption ?? "", coordinate: locationManager.location!.coordinate, seenBy: ["The bois", "craig", "eric"], isAnonymous: isAnonymous)
-        id = id+1
+        
+        //take uid, avatar, etc from current user and call
+        //this with all note information inside a dictionary!
+        guard let caption = caption, let image = image else {
+            print("nil value for caption/image")
+            return
+        }
+        
+        let latitude = locationManager.location!.coordinate.latitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
+        let longitude = Double(-121.532000000).truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
+        
+        //give note/noteImage unique linked identifier
+        let noteName = NSUUID().uuidString
+        
+        //get current user information
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("failed to get user information")
+            return
+        }
+        
+        var username: String?
+        var profileImageURL: String?
+        
+        //get user data for note and call DataService to upload
+        Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                username = dictionary["username"] as? String
+                profileImageURL = dictionary["profileImageLink"] as? String
+                
+                if username == nil || profileImageURL == nil {
+                    print("failed to fetch userdata")
+                    return
+                }
+                
+                let newNote = ["id": noteName, "uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "seenBy": [], "isAnonymous": isAnonymous] as [String : Any]
+                if DataService.instance.createNewNote(noteData: newNote, latitude: latitude, longitude: longitude, noteImage: image) {
+                    print("could not add new note because one already exists there")
+                }
+            }
+        }, withCancel: nil)
+        return
+         /*
+        TODO: WHEN LOADING MAP REGION FOR-LOOP THROUGH ALL NEARBY (IN VIEW) ANNOTATIONS
+         
         notes.append(newNote)
         let annotation = NoteAnnotation(note: newNote)
-        mapView.addAnnotation(annotation)
+        mapView.addAnnotation(annotation)*/
     }
     
     @IBAction func newNoteButtonPressed(_ sender: Any) {
@@ -207,8 +249,6 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         newNoteVC.modalPresentationCapturesStatusBarAppearance = true
         self.present(newNoteVC, animated: true, completion: nil)
     }
-    
-    
 }
 
 extension GPSViewController: CLLocationManagerDelegate {

@@ -16,14 +16,12 @@ class InitialViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let vc = segue.destination as? LogInViewController {
-            vc.modalPresentationCapturesStatusBarAppearance = true
-        }
         if let vc = segue.destination as? CreateAccountViewController {
             vc.modalPresentationCapturesStatusBarAppearance = true
         }
     }
+    
+    @IBAction func unwindToRoot(segue: UIStoryboardSegue) {}
     
 }

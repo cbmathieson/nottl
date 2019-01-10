@@ -41,7 +41,7 @@ class NoteManager: NSObject {
             //also want to implement this with a seperate table view that pops out when you click on "seen by x people"
             let seenBy = ["BigYEET69", "CraigMathieson", "FlorAddington"]
             
-            let note = Note(id: i, userName: userName, avatar: avatar!, noteImage: noteImage, caption: caption, coordinate: coordinate, seenBy: seenBy, isAnonymous: false)
+            let note = Note(id: i, userName: userName, avatar: avatar!, noteImage: noteImage!, caption: caption, coordinate: coordinate, seenBy: seenBy, isAnonymous: false)
             notes.append(note)
         }
     }

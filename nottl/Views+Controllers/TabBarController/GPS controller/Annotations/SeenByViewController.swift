@@ -15,7 +15,7 @@ class SeenByViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        //TODO: Take data and build a table view for the accounts who have seen the note
     }
     
 

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //setup firebase
+        FirebaseApp.configure()
+        
+        //if no user is logged in/verified , present Auth view controller
+        Auth.auth().addStateDidChangeListener { auth, user in
+            if let user = user {
+                // User is signed in.
+                if user.isEmailVerified {
+                    return
+                }
+            }
+            let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+            let authVC = storyboard.instantiateViewController(withIdentifier: "AuthVC")
+            self.window?.makeKeyAndVisible()
+            self.window?.rootViewController?.present(authVC, animated: false, completion: nil)
+        }
+        
         return true
     }
 
