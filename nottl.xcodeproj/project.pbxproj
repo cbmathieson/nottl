@@ -19,7 +19,6 @@
 		2159AC5721E6B5B700C5B564 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2159AC5621E6B5B700C5B564 /* Double.swift */; };
 		21789ACC21C105C4005355A1 /* textField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789ACB21C105C4005355A1 /* textField.swift */; };
 		21789AD021C11188005355A1 /* NewNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789ACF21C11188005355A1 /* NewNoteViewController.swift */; };
-		21789AD521C200DC005355A1 /* NoteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789AD421C200DC005355A1 /* NoteManager.swift */; };
 		21789AD721C23B8E005355A1 /* NoteAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789AD621C23B8E005355A1 /* NoteAnnotation.swift */; };
 		21789AD921C23EE6005355A1 /* NoteAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21789AD821C23EE6005355A1 /* NoteAnnotationView.swift */; };
 		21789ADB21C3170F005355A1 /* NoteDetailMapView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 21789ADA21C3170F005355A1 /* NoteDetailMapView.xib */; };
@@ -52,7 +51,6 @@
 		2159AC5621E6B5B700C5B564 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		21789ACB21C105C4005355A1 /* textField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = textField.swift; sourceTree = "<group>"; };
 		21789ACF21C11188005355A1 /* NewNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewNoteViewController.swift; sourceTree = "<group>"; };
-		21789AD421C200DC005355A1 /* NoteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteManager.swift; sourceTree = "<group>"; };
 		21789AD621C23B8E005355A1 /* NoteAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteAnnotation.swift; sourceTree = "<group>"; };
 		21789AD821C23EE6005355A1 /* NoteAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteAnnotationView.swift; sourceTree = "<group>"; };
 		21789ADA21C3170F005355A1 /* NoteDetailMapView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoteDetailMapView.xib; sourceTree = "<group>"; };
@@ -128,7 +126,6 @@
 			isa = PBXGroup;
 			children = (
 				2110318E218EABE500CB99FF /* Note.swift */,
-				21789AD421C200DC005355A1 /* NoteManager.swift */,
 				21789AD621C23B8E005355A1 /* NoteAnnotation.swift */,
 				21789AD821C23EE6005355A1 /* NoteAnnotationView.swift */,
 			);
@@ -381,7 +378,6 @@
 				218CC651216C509300E6BE20 /* TabBarViewController.swift in Sources */,
 				21B55CFC21C4765E0073D406 /* ImageDetailsViewController.swift in Sources */,
 				21B55CFE21C47CBF0073D406 /* SeenByViewController.swift in Sources */,
-				21789AD521C200DC005355A1 /* NoteManager.swift in Sources */,
 				2159AC4021CEE17800C5B564 /* String.swift in Sources */,
 				21789AD021C11188005355A1 /* NewNoteViewController.swift in Sources */,
 				21F45B2121654C2800849617 /* InitialViewController.swift in Sources */,

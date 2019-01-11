@@ -57,7 +57,8 @@ class NoteDetailMapView: UIView {
     func configureWithNote(note: Note) {
         self.note = note
         
-        imageButton.setImage(note.avatar, for: .normal)
+        //TODO: convert profileimageURL to UIImage
+        //imageButton.setImage(note.avatar, for: .normal)
         userNameLabel.text = note.userName
         descriptionLabel.text = note.caption
         

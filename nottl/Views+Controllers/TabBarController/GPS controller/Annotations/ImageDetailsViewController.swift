@@ -57,12 +57,13 @@ class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
         avatarButton.layer.borderColor = nottlGrey.cgColor
         avatarButton.layer.borderWidth = 2.0
         
-        if note != nil {
+        //TODO: convert imageURL to UIImage
+        /*if note != nil {
             imagePreview.image = note?.noteImage
             imageFullscreen.image = note?.noteImage
             avatarButton.setImage(note?.avatar, for: .normal)
             caption.text = note?.caption
-        }
+        }*/
     }
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {

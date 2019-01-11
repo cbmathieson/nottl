@@ -61,34 +61,34 @@ class DataService {
             return false
         }
         
-        //upload image to firebase storage
-        storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
-            if error != nil {
-                print(String(describing: error))
-                //ABORT!
-                print("failed to upload image data")
+        self.REF_MAPPED_NOTES.child(latitude).child(longitude).observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() {
+                note_exists = true
+                print("note exists already")
                 return
             }
             
-            //once upload completes, get url and create note with noteimage link
-            storageRef.downloadURL(completion: { (url, error) in
-                if let link = url?.absoluteString {
-                    noteData["noteImage"] = link
-                } else {
-                    print("failed to get image link")
+            //upload image to firebase storage
+            storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
+                if error != nil {
+                    print(String(describing: error))
+                    //ABORT!
+                    print("failed to upload image data")
                     return
                 }
                 
-                //if successful add the new note to the database
-                self.REF_MAPPED_NOTES.child(latitude).child(longitude).observeSingleEvent(of: .value) { (snapshot) in
-                    
-                    if snapshot.exists() {
-                        note_exists = true
+                //once upload completes, get url and create note with noteimage link
+                storageRef.downloadURL(completion: { (url, error) in
+                    if let link = url?.absoluteString {
+                        noteData["noteImage"] = link
                     } else {
-                        self.REF_MAPPED_NOTES.child(latitude).child(longitude).updateChildValues(noteData)
+                        print("failed to get image link")
+                        return
                     }
-                }
-            })
+                    print("attempting to upload note")
+                    self.REF_MAPPED_NOTES.child(latitude).child(longitude).updateChildValues(noteData)
+                })
+            }
         }
         return note_exists
     }

@@ -11,7 +11,9 @@ import MapKit
 
 class NoteAnnotation: NSObject, MKAnnotation {
     var note: Note
-    var coordinate: CLLocationCoordinate2D { return note.coordinate }
+    var coordinate: CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: note.latitude, longitude: note.longitude)
+    }
     
     init(note: Note) {
         self.note = note

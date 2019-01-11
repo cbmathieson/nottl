@@ -11,25 +11,28 @@ import Foundation
 import MapKit
 
 class Note: NSObject {
-    var id: Int
-    var userName: String
-    var avatar: UIImage
-    var noteImage: UIImage
     var caption: String
-    var coordinate: CLLocationCoordinate2D
-    var seenBy = [String]()
+    var id: String
     var isAnonymous: Bool
+    var noteImage: String
+    var profileImage: String
+    var userName: String
+    var latitude: Double
+    var longitude: Double
+    //will be a list of uids so we can relate to their profile
+    var seenBy: [String]
     
-    init(id: Int, userName: String, avatar: UIImage, noteImage: UIImage, caption: String, coordinate: CLLocationCoordinate2D, seenBy: [String], isAnonymous: Bool) {
-        self.id = id
-        self.userName = userName
-        self.avatar = avatar
-        self.noteImage = noteImage
+    init(caption: String, id: String, isAnonymous: Bool, noteImage: String, profileImage: String, userName: String, latitude: Double, longitude: Double, seenBy: [String]) {
         self.caption = caption
-        self.coordinate = coordinate
+        self.id = id
+        self.isAnonymous = isAnonymous
+        self.noteImage = noteImage
+        self.profileImage = profileImage
+        self.userName = userName
+        self.latitude = latitude
+        self.longitude = longitude
         //should initialize with empty array but adding for testing
         self.seenBy = seenBy
-        self.isAnonymous = isAnonymous
         
         super.init()
     }

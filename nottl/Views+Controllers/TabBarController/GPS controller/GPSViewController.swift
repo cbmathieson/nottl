@@ -69,13 +69,41 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     //add notes currently in array
     //will add a backend later to filter in relevant(nearby) notes
     func configureNotesInMap() {
-        var annotations = [MKAnnotation]()
-        for note in notes {
-            let annotation = NoteAnnotation(note: note)
-            annotations.append(annotation)
+        
+        //empty notes array
+        notes.removeAll()
+        //get notes from database
+        
+        //TODO: optimize to only get notes in visible range of the map!!
+        //this will mean hopefully figuring out how to grab only certain sections of a dictionary from the database
+        Database.database().reference().child("notes").observeSingleEvent(of: .value) { (snapshot) in
+            if let latDictionary = snapshot.value as? [String: AnyObject] {
+                for (_,value) in latDictionary {
+                    if let lonDictionary = value as? [String: AnyObject] {
+                        for (_, value) in lonDictionary {
+                            if let noteDictionary = value as? [String: AnyObject] {
+                                
+                                guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let seenBy = noteDictionary["seenBy"] as? [String] else {
+                                    break
+                                }
+                                
+                                let newNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, seenBy: seenBy)
+                                
+                                self.notes.append(newNote)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            var annotations = [MKAnnotation]()
+            for note in self.notes {
+                let annotation = NoteAnnotation(note: note)
+                annotations.append(annotation)
+            }
+            self.mapView.removeAnnotations(self.mapView.annotations)
+            self.mapView.addAnnotations(annotations)
         }
-        mapView.removeAnnotations(mapView.annotations)
-        mapView.addAnnotations(annotations)
     }
     
     //MKMapViewDelegate methods
@@ -199,8 +227,13 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
             return
         }
         
-        let latitude = locationManager.location!.coordinate.latitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
-        let longitude = Double(-121.532000000).truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
+        //gets coordinates to set in lists in firebase. Truncates to coordinates within 1.1m
+        //which is slightly finer than the accuracy of the gps chip
+        let fullLatitude = locationManager.location!.coordinate.latitude
+        let fullLongitude = locationManager.location!.coordinate.longitude
+        
+        let latitude = fullLatitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
+        let longitude = fullLongitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
         
         //give note/noteImage unique linked identifier
         let noteName = NSUUID().uuidString
@@ -226,7 +259,9 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
                     return
                 }
                 
-                let newNote = ["id": noteName, "uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "seenBy": [], "isAnonymous": isAnonymous] as [String : Any]
+                let seenBy = ["uids here"]
+                
+                let newNote = ["id": noteName, "uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "isAnonymous": isAnonymous, "latitude": fullLatitude, "longitude": fullLongitude, "seenBy": seenBy] as [String : Any]
                 if DataService.instance.createNewNote(noteData: newNote, latitude: latitude, longitude: longitude, noteImage: image) {
                     print("could not add new note because one already exists there")
                 }
