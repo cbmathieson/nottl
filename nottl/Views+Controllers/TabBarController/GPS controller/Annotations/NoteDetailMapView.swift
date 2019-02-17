@@ -9,10 +9,11 @@
 import UIKit
 import Foundation
 import MapKit
+import Firebase
 
 //any class using this protocol must implement detailsrequestedfornote
 protocol NoteDetailMapViewDelegate: class {
-    func detailsRequestedForNote(note: Note)
+    func detailsRequestedForNote(note: Note, currentAvatarImage: UIImage?)
     func detailsRequestedForSeenBy(note: Note)
 }
 
@@ -44,7 +45,7 @@ class NoteDetailMapView: UIView {
     
     //actions
     @IBAction func imageSelected(_ sender: Any) {
-        delegate?.detailsRequestedForNote(note: note)
+        delegate?.detailsRequestedForNote(note: note, currentAvatarImage: imageButton.image(for: .normal))
     }
     
     @IBAction func viewedBySelected(_ sender: Any) {
@@ -57,8 +58,25 @@ class NoteDetailMapView: UIView {
     func configureWithNote(note: Note) {
         self.note = note
         
-        //TODO: convert profileimageURL to UIImage
-        //imageButton.setImage(note.avatar, for: .normal)
+        //convert url to image from storage
+        
+        let url = URL(string: note.profileImage)
+        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+            
+            if error != nil {
+                print("error with getting image from url")
+                return
+            }
+            
+            if let image = UIImage(data: data!) {
+                DispatchQueue.main.async {
+                    self.imageButton.setImage(image, for: .normal)
+                }
+            } else {
+                print("image not found in storage")
+            }
+        }).resume()
+        
         userNameLabel.text = note.userName
         descriptionLabel.text = note.caption
         
@@ -81,4 +99,6 @@ class NoteDetailMapView: UIView {
         //makes sure callout is not delselected when anything but the buttons are selected
         return backgroundContentButton.hitTest(convert(point, to: backgroundContentButton), with: event)
     }
+    
+    
 }

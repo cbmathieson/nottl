@@ -10,9 +10,11 @@ import UIKit
 import MapKit
 import Firebase
 
-class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewDelegate, ModalDelegate {
+class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewDelegate, ModalDelegate {    
     
     //Outlets
+    @IBOutlet weak var distanceLabel: UILabel!
+    @IBOutlet weak var distanceFromPinView: UIView!
     @IBOutlet weak var FailedPermissionsView: UIView!
     @IBOutlet weak var mapView: MKMapView!
     
@@ -22,6 +24,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     var isAnimated = false
     var zoomIn = false
     var selectedNote: Note?
+    var currentUserImage: UIImage?
     var notes = [Note]()
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,11 +70,13 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     }
     
     //add notes currently in array
-    //will add a backend later to filter in relevant(nearby) notes
     func configureNotesInMap() {
         
         //empty notes array
         notes.removeAll()
+        //remove old overlays
+        let overlays = mapView.overlays
+        mapView.removeOverlays(overlays)
         //get notes from database
         
         //TODO: optimize to only get notes in visible range of the map!!
@@ -97,6 +102,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
             }
             
             var annotations = [MKAnnotation]()
+            
             for note in self.notes {
                 let annotation = NoteAnnotation(note: note)
                 annotations.append(annotation)
@@ -113,7 +119,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         let circleRenderer = MKCircleRenderer(overlay: overlay)
         circleRenderer.fillColor = UIColor.lightGray.withAlphaComponent(0.5)
         circleRenderer.strokeColor = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
-        circleRenderer.lineWidth = 0.5
+        circleRenderer.lineWidth = 1.0
         return circleRenderer
     }
     
@@ -135,32 +141,14 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         }
         
         addOverlay(annotation: annotation)
-        annotationView?.isEnabled = inRange(annotation: annotation)
         return annotationView
-    }
-    
-    //rechecks if note is within distance when tapped
-    //and disables clicks on user location
-    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        if let annotation = view.annotation {
-            if annotation is MKUserLocation {
-                view.isEnabled = false
-            } else {
-                if inRange(annotation: annotation) {
-                    view.isEnabled = true
-                } else {
-                    mapView.deselectAnnotation(annotation, animated: false)
-                    view.isEnabled = false
-                }
-            }
-        }
     }
     
     //checks to see if user is in note's area
     //Uses Haversine Formula to find distance between note and user
-    func inRange(annotation: MKAnnotation) -> Bool {
-        let annotationLatitude = annotation.coordinate.latitude
-        let annotationLongitude = annotation.coordinate.longitude
+    func inRange(note: Note) -> Int {
+        let annotationLatitude = note.latitude
+        let annotationLongitude = note.longitude
         
         let userLatitude = locationManager.location!.coordinate.latitude
         let userLongitude = locationManager.location!.coordinate.longitude
@@ -179,8 +167,8 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         let d = 2 * atan2(sqrt(c), sqrt(1-c))
         let difference = earthsRadius * d
         
-        //check if user within 50m
-        return difference < 50.0
+        //send back distance from user to note
+        return Int(difference)
     }
     
     func addOverlay(annotation: MKAnnotation) {
@@ -195,18 +183,50 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
             if let vc = segue.destination as? ImageDetailsViewController {
                 vc.modalPresentationCapturesStatusBarAppearance = true
                 vc.note = self.selectedNote
+                if let image = self.currentUserImage {
+                    vc.currentUserImage = image
+                }
             }
+            return
         } else if segue.identifier == "viewedBy" {
-           if let vc = segue.destination as? SeenByViewController {
+            if let vc = segue.destination as? SeenByViewController {
                 vc.note = self.selectedNote
-           }
+            }
         }
     }
     
-    //if avatar image is selected: run segue to fullscreen image
-    func detailsRequestedForNote(note: Note) {
-        self.selectedNote = note
-        self.performSegue(withIdentifier: "imageDetails", sender: nil)
+    //if avatar image is selected and within 50m: run segue to fullscreen image
+    //else print distance to note on screen
+    func detailsRequestedForNote(note: Note, currentAvatarImage: UIImage?) {
+        let distance = inRange(note: note)
+        if distance < 50 {
+            self.selectedNote = note
+            self.currentUserImage = currentAvatarImage
+            self.performSegue(withIdentifier: "imageDetails", sender: nil)
+        } else {
+            //break into thousands with commas
+            let numberFormatter = NumberFormatter()
+            numberFormatter.numberStyle = .decimal
+            numberFormatter.groupingSeparator = ","
+            if let distanceString = numberFormatter.string(from: NSNumber(value: distance)) {
+                distanceLabel.text = distanceString + "m out"
+                //begin fades...
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.distanceFromPinView.alpha = 0.5
+                    self.distanceLabel.alpha = 1.0
+                }) { (finished) in
+                    UIView.animate(withDuration: 1.5, animations: {
+                        //wait 1.5 secs
+                        self.distanceFromPinView.alpha = 0.51
+                    }) { (finished) in
+                        UIView.animate(withDuration: 0.5, animations: {
+                            self.distanceLabel.alpha = 0.0
+                            self.distanceFromPinView.alpha = 0.0
+                        })
+                    }
+                }
+            }
+        }
     }
     
     //if user selects "viewed by..." run segue to tableview of users
@@ -217,7 +237,6 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     
     
     //when share button is pressed in NewNoteVC, form is passed here to create new note
-    //WILL ADD MORE DEPENDENT INFORMATION LATER ON, JUST WANT TO MAKE IT FUNCTIONAL RN
     func addNote(image: UIImage?, caption: String?, isAnonymous: Bool) {
         
         //take uid, avatar, etc from current user and call
@@ -262,18 +281,15 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
                 let seenBy = ["uids here"]
                 
                 let newNote = ["id": noteName, "uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "isAnonymous": isAnonymous, "latitude": fullLatitude, "longitude": fullLongitude, "seenBy": seenBy] as [String : Any]
-                if DataService.instance.createNewNote(noteData: newNote, latitude: latitude, longitude: longitude, noteImage: image) {
-                    print("could not add new note because one already exists there")
-                }
+                DataService.instance.createNewNote(noteData: newNote, latitude: latitude, longitude: longitude, noteImage: image, completion: { (success) -> Void in
+                    if !success {
+                        print("could not add new note because one already exists there")
+                    }
+                })
             }
         }, withCancel: nil)
-        return
-         /*
-        TODO: WHEN LOADING MAP REGION FOR-LOOP THROUGH ALL NEARBY (IN VIEW) ANNOTATIONS
-         
-        notes.append(newNote)
-        let annotation = NoteAnnotation(note: newNote)
-        mapView.addAnnotation(annotation)*/
+        
+        //TODO: WHEN LOADING MAP REGION FOR-LOOP THROUGH ALL NEARBY (IN VIEW) ANNOTATIONS
     }
     
     @IBAction func newNoteButtonPressed(_ sender: Any) {

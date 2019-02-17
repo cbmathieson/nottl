@@ -51,7 +51,10 @@ class AuthService {
                         
                         //if successful, add the new user to the database
                         //Adding ability to add captions later on...
-                        let userData = ["provider": user.providerID, "email": user.email, "username": username, "caption": "", "profileImageLink": profileImageLink]
+                        let favorites = ["favorite notes here"]
+                        let myNotes = ["my notes here"]
+                        
+                        let userData = ["provider": user.providerID, "email": user.email!, "username": username, "caption": "", "profileImageLink": profileImageLink, "favorites": favorites, "myNotes": myNotes] as [String: Any]
                         DataService.instance.createDBUser(uid: user.uid, userData: userData as Dictionary<String, Any>)
                         userCreationCompleted(true, nil)
                     })
@@ -86,6 +89,7 @@ class AuthService {
     
     func checkVerification() -> Bool {
         guard let isVerified = Auth.auth().currentUser?.isEmailVerified else {
+            print("failed to get user info")
             return false
         }
         return isVerified

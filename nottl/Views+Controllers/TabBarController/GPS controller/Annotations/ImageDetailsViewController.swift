@@ -18,6 +18,8 @@ class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var fullscreenScroll: UIScrollView!
     @IBOutlet weak var contentCover: UIView!
     
+    var currentUserImage: UIImage?
+    
     //removes status bar for fullscreen effect
     override var prefersStatusBarHidden: Bool { return true }
     
@@ -30,6 +32,11 @@ class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //sets user image from past screen so i do not need another network request
+        if let image = currentUserImage {
+            avatarButton.setImage(image, for: .normal)
+        }
         
         //set scrollView for fullscreen image
         self.fullscreenScroll.minimumZoomScale = 1.0;
@@ -57,13 +64,37 @@ class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
         avatarButton.layer.borderColor = nottlGrey.cgColor
         avatarButton.layer.borderWidth = 2.0
         
-        //TODO: convert imageURL to UIImage
-        /*if note != nil {
-            imagePreview.image = note?.noteImage
-            imageFullscreen.image = note?.noteImage
-            avatarButton.setImage(note?.avatar, for: .normal)
-            caption.text = note?.caption
-        }*/
+        //convert imageURL and profile imageURL to UIImage
+        
+        if let presentingNote = note {
+            
+            caption.text = presentingNote.caption
+            
+            //get image from storage
+            let url = URL(string: presentingNote.noteImage)
+            
+            URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+                
+                if error != nil {
+                    print("error fetching image")
+                    return
+                }
+                
+                if let image = UIImage(data: data!) {
+                    DispatchQueue.main.async {
+                        self.imageFullscreen.image = image
+                        self.imagePreview.image = image
+                    }
+                } else {
+                    print("image not found in storage")
+                }
+            }).resume()
+        }
+    }
+    
+    
+    @IBAction func favoriteButtonPressed(_ sender: Any) {
+        DataService.instance.addToFavorites(note: note)
     }
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {

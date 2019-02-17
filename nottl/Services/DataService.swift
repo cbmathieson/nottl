@@ -39,18 +39,25 @@ class DataService {
         REF_USERS.child(uid).updateChildValues(userData)
     }
     
+    func addToMyNotes(noteURL: String, uid: String) {
+        REF_USERS.child(uid).child("myNotes").childByAutoId().setValue(noteURL)
+    }
+    
     //sends new note to firebase
-    func createNewNote(noteData: Dictionary<String, Any>, latitude: String, longitude: String, noteImage: UIImage) -> Bool {
+    func createNewNote(noteData: Dictionary<String, Any>, latitude: String, longitude: String, noteImage: UIImage, completion: (Bool) -> ()) {
         
         //check if value already exists in the space
         
         var note_exists = false
         //allows dictionary to be mutated
         var noteData = noteData
+        //gets location of note to reference as user
+        var noteLocationPath = ""
         
         guard let imageName = noteData["id"] as? String else {
             print("failed to get note id")
-            return false
+            completion(false)
+            return
         }
         
         let storageRef = Storage.storage().reference().child("notes/\(imageName).jpg")
@@ -58,7 +65,8 @@ class DataService {
         //compress image to <100KB ... hopefully
         guard let uploadData = noteImage.compressImage() else {
             print("could not compress image data")
-            return false
+            completion(false)
+            return
         }
         
         self.REF_MAPPED_NOTES.child(latitude).child(longitude).observeSingleEvent(of: .value) { (snapshot) in
@@ -87,10 +95,34 @@ class DataService {
                     }
                     print("attempting to upload note")
                     self.REF_MAPPED_NOTES.child(latitude).child(longitude).updateChildValues(noteData)
+                    
+                    if let uid = noteData["uid"] as? String {
+                        noteLocationPath = String(describing: snapshot.ref.description())
+                        print(String(describing: noteLocationPath))
+                        
+                        self.addToMyNotes(noteURL: noteLocationPath, uid: uid)
+                    }
                 })
             }
         }
-        return note_exists
+        completion(note_exists)
     }
     
+    func addToFavorites(note: Note?) {
+        guard let note = note else {
+            print("failed to get current note!")
+            return
+        }
+        
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("could not get current user")
+            return
+        }
+        
+        let latitude = note.latitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
+        let longitude = note.longitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
+        
+        let favoriteNoteURL = String(describing: self.REF_MAPPED_NOTES.child(latitude).child(longitude))
+        REF_USERS.child(uid).child("favorites").child(note.id).setValue(favoriteNoteURL)
+    }
 }

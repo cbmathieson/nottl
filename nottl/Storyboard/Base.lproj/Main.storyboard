@@ -373,7 +373,7 @@
                                     <action selector="shareButtonPressed:" destination="Teh-jg-aQf" eventType="touchUpInside" id="iba-UT-OGw"/>
                                 </connections>
                             </button>
-                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Failed to log out :(" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="66c-Gn-MMZ">
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Failed to log out :(" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="66c-Gn-MMZ">
                                 <rect key="frame" x="85" y="170" width="150" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="xiw-dn-AGo"/>
@@ -514,17 +514,37 @@
                                     <constraint firstItem="m0Z-Wt-9TV" firstAttribute="centerY" secondItem="SMn-fp-ent" secondAttribute="centerY" constant="20" id="nZQ-jh-cLr"/>
                                 </constraints>
                             </view>
+                            <view userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzM-ms-QnX">
+                                <rect key="frame" x="0.0" y="20" width="320" height="499"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50m away" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sEd-TI-LnE">
+                                        <rect key="frame" x="73" y="241" width="174.5" height="47"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="39"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="sEd-TI-LnE" firstAttribute="centerX" secondItem="MzM-ms-QnX" secondAttribute="centerX" id="DM8-Dq-M66"/>
+                                    <constraint firstItem="sEd-TI-LnE" firstAttribute="centerY" secondItem="MzM-ms-QnX" secondAttribute="centerY" constant="15" id="zWL-4t-KQa"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="MzM-ms-QnX" firstAttribute="leading" secondItem="ASJ-qq-Pni" secondAttribute="leading" id="2Cy-vl-Btc"/>
                             <constraint firstItem="ASJ-qq-Pni" firstAttribute="bottom" secondItem="ueP-qb-uDj" secondAttribute="bottom" id="5Ab-EX-b4p"/>
                             <constraint firstItem="ASJ-qq-Pni" firstAttribute="bottom" secondItem="SMn-fp-ent" secondAttribute="bottom" id="BFG-vX-0UP"/>
                             <constraint firstItem="ASJ-qq-Pni" firstAttribute="trailing" secondItem="ueP-qb-uDj" secondAttribute="trailing" id="FjM-uX-xGB"/>
                             <constraint firstItem="ueP-qb-uDj" firstAttribute="leading" secondItem="ASJ-qq-Pni" secondAttribute="leading" id="Gax-Ja-bhb"/>
+                            <constraint firstItem="ASJ-qq-Pni" firstAttribute="trailing" secondItem="MzM-ms-QnX" secondAttribute="trailing" id="HLg-lL-GCN"/>
                             <constraint firstItem="5Jz-IT-TjD" firstAttribute="top" secondItem="ASJ-qq-Pni" secondAttribute="top" id="Q7W-BW-tPq"/>
                             <constraint firstItem="SMn-fp-ent" firstAttribute="top" secondItem="ASJ-qq-Pni" secondAttribute="top" id="U2z-9W-qhT"/>
                             <constraint firstItem="5Jz-IT-TjD" firstAttribute="centerX" secondItem="rGo-Kr-3R3" secondAttribute="centerX" id="UK6-Dn-mpR"/>
+                            <constraint firstItem="MzM-ms-QnX" firstAttribute="top" secondItem="ASJ-qq-Pni" secondAttribute="top" id="b54-Bx-nJz"/>
                             <constraint firstItem="SMn-fp-ent" firstAttribute="leading" secondItem="ASJ-qq-Pni" secondAttribute="leading" id="u3S-5V-TyQ"/>
+                            <constraint firstItem="ASJ-qq-Pni" firstAttribute="bottom" secondItem="MzM-ms-QnX" secondAttribute="bottom" id="und-nW-x6N"/>
                             <constraint firstItem="ASJ-qq-Pni" firstAttribute="trailing" secondItem="SMn-fp-ent" secondAttribute="trailing" id="upQ-FD-Vl7"/>
                             <constraint firstItem="ueP-qb-uDj" firstAttribute="top" secondItem="ASJ-qq-Pni" secondAttribute="top" id="zXZ-FJ-sfR"/>
                         </constraints>
@@ -535,6 +555,8 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="FailedPermissionsView" destination="SMn-fp-ent" id="fnu-k4-a7M"/>
+                        <outlet property="distanceFromPinView" destination="MzM-ms-QnX" id="ena-Cz-1CZ"/>
+                        <outlet property="distanceLabel" destination="sEd-TI-LnE" id="7rU-kO-6VE"/>
                         <outlet property="mapView" destination="ueP-qb-uDj" id="Opi-xu-F18"/>
                         <segue destination="cFc-mi-vRW" kind="presentation" identifier="viewedBy" modalPresentationStyle="overCurrentContext" id="lLy-0K-z14"/>
                         <segue destination="OEX-RS-PbE" kind="presentation" identifier="imageDetails" modalPresentationStyle="overFullScreen" id="wQJ-Pt-aPC"/>
@@ -543,7 +565,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pPq-3Y-WuL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7092" y="-442"/>
+            <point key="canvasLocation" x="7091.25" y="-442.6056338028169"/>
         </scene>
         <!--New Note View Controller-->
         <scene sceneID="Wf3-xT-8KF">
@@ -709,6 +731,7 @@
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <action selector="shareButtonPressed:" destination="Teh-jg-aQf" eventType="touchUpInside" id="zmw-Z9-cCM"/>
+                                                            <action selector="sharebtnPressed:" destination="Teh-jg-aQf" eventType="touchUpInside" id="o30-YK-Bft"/>
                                                         </connections>
                                                     </button>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="[Anonymous]" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FdS-QL-eeo">
@@ -976,6 +999,7 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
+                                                            <action selector="favoriteButtonPressed:" destination="OEX-RS-PbE" eventType="touchUpInside" id="pcd-TS-gBc"/>
                                                             <action selector="favoritedNote:" destination="OEX-RS-PbE" eventType="touchUpInside" id="p6E-fh-VAJ"/>
                                                         </connections>
                                                     </button>
