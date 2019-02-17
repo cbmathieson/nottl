@@ -222,7 +222,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
                         UIView.animate(withDuration: 0.5, animations: {
                             self.distanceLabel.alpha = 0.0
                             self.distanceFromPinView.alpha = 0.0
-                        })
+                        }) //
                     }
                 }
             }
