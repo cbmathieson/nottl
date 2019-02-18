@@ -44,11 +44,9 @@ class DataService {
     }
     
     //sends new note to firebase
-    func createNewNote(noteData: Dictionary<String, Any>, latitude: String, longitude: String, noteImage: UIImage, completion: (Bool) -> ()) {
+    func createNewNote(noteData: Dictionary<String, Any>, latitude: String, longitude: String, noteImage: UIImage, completion: @escaping (Bool) -> ()) {
         
         //check if value already exists in the space
-        
-        var note_exists = false
         //allows dictionary to be mutated
         var noteData = noteData
         //gets location of note to reference as user
@@ -63,7 +61,7 @@ class DataService {
         let storageRef = Storage.storage().reference().child("notes/\(imageName).jpg")
         
         //compress image to <100KB ... hopefully
-        guard let uploadData = noteImage.compressImage() else {
+        guard let uploadData = noteImage.compressImage(maxHeight: 640.0, maxWidth: 1136.0) else {
             print("could not compress image data")
             completion(false)
             return
@@ -71,8 +69,8 @@ class DataService {
         
         self.REF_MAPPED_NOTES.child(latitude).child(longitude).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                note_exists = true
                 print("note exists already")
+                completion(false)
                 return
             }
             
@@ -82,6 +80,7 @@ class DataService {
                     print(String(describing: error))
                     //ABORT!
                     print("failed to upload image data")
+                    completion(false)
                     return
                 }
                 
@@ -91,6 +90,7 @@ class DataService {
                         noteData["noteImage"] = link
                     } else {
                         print("failed to get image link")
+                        completion(false)
                         return
                     }
                     print("attempting to upload note")
@@ -105,7 +105,7 @@ class DataService {
                 })
             }
         }
-        completion(note_exists)
+        completion(true)
     }
     
     func addToFavorites(note: Note?) {

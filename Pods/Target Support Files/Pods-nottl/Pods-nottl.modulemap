@@ -1,0 +1,6 @@
+framework module Pods_nottl {
+  umbrella header "Pods-nottl-umbrella.h"
+
+  export *
+  module * { export * }
+}

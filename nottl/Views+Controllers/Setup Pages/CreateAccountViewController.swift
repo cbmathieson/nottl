@@ -8,6 +8,9 @@
 
 import Foundation
 import UIKit
+import Photos
+import AVFoundation
+import RSKImageCropper
 
 class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -31,6 +34,7 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
     var imagePickerActivated = false
     var imageChosen: UIImage? = nil
     
+    var imagePickerController : UIImagePickerController!
     var isKeyboardActive = false
     let nottlRed = UIColor(red: 179.0/255.0, green: 99.0/255.0, blue: 86/255.0, alpha: 1.0)
     let nottlGrey = UIColor(red: 199.0/255.0, green: 199.0/255.0, blue: 204.0/255.0, alpha: 1.0)
@@ -65,6 +69,58 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
             NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         } else {
             imagePickerActivated = false
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        checkPhotoPermission()
+    }
+    
+    //check permissions
+    func checkPhotoPermission() {
+        let status = PHPhotoLibrary.authorizationStatus()
+        switch status {
+        case .authorized:
+            print("have access to library")
+        case .denied, .restricted :
+            print("access to photolibrary not available")
+        case .notDetermined:
+            // ask for permissions
+            PHPhotoLibrary.requestAuthorization { status in
+                switch status {
+                case .authorized:
+                    print("now have access")
+                case .denied, .restricted:
+                    print("still dont have access")
+                case .notDetermined:
+                    print("not determined...")
+                }
+            }
+        }
+        let cameraMediaType = AVMediaType.video
+        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: cameraMediaType)
+        
+        switch cameraAuthorizationStatus {
+        case .denied:
+            print("camera access denied")
+            break
+        case .authorized:
+            print("camera access authorized")
+            break
+        case .restricted:
+            print("camera access restricted")
+            break
+            
+        case .notDetermined:
+            // Prompting user for the permission to use the camera.
+            AVCaptureDevice.requestAccess(for: cameraMediaType) { granted in
+                if granted {
+                    print("Granted access to \(cameraMediaType)")
+                } else {
+                    print("Denied access to \(cameraMediaType)")
+                }
+            }
         }
     }
     
@@ -106,9 +162,9 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
     
     @IBAction func selectImageButtonPressed(_ sender: Any) {
         imagePickerActivated = true
-        let imagePickerController = UIImagePickerController()
+        imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
-        imagePickerController.allowsEditing = true
+        imagePickerController.allowsEditing = false
         imagePickerController.modalPresentationStyle = .overCurrentContext
         
         //makes user choose photos or camera as source
@@ -117,8 +173,8 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
         //camera option
         actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { (action: UIAlertAction) in
             if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                imagePickerController.sourceType = .camera
-                self.present(imagePickerController, animated: true, completion: nil)
+                self.imagePickerController.sourceType = .camera
+                self.present(self.imagePickerController, animated: true, completion: nil)
             } else {
                 print("Camera not available")
             }
@@ -126,8 +182,8 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
         
         //photos option
         actionSheet.addAction(UIAlertAction(title: "Photos", style: .default, handler: { (action: UIAlertAction) in
-            imagePickerController.sourceType = .photoLibrary
-            self.present(imagePickerController, animated: true, completion: nil)
+            self.imagePickerController.sourceType = .photoLibrary
+            self.present(self.imagePickerController, animated: true, completion: nil)
         }))
         
         //cancel button
@@ -136,7 +192,7 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
         self.present(actionSheet, animated: true, completion: nil)
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
             profileImageView.image = image
@@ -149,20 +205,36 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
         } else {
             print("something went wrong :(")
         }
-        picker.dismiss(animated: true, completion: nil)
+        picker.dismiss(animated: false, completion: { () -> Void in
+            if let image = self.profileImageView.image {
+                let imageCropViewController = RSKImageCropViewController(image: image)
+                imageCropViewController.delegate = self
+                self.present(imageCropViewController, animated: true, completion: nil)
+            }
+        })
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
     
+    /*internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        if let image : UIImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            picker.dismiss(animated: false, completion: { () -> Void in
+                var imageCropVC : RSKImageCropViewController!
+                imageCropVC = RSKImageCropViewController(image: image, cropMode: .circle)
+                imageCropVC.delegate = self
+                print("made it this far...")
+                self.navigationController?.pushViewController(imageCropVC, animated: true)
+            })
+        }
+    }*/
+    
     @IBAction func createAccount(_ sender: Any?) {
         self.view.window?.endEditing(true)
         if startRegistration(username: newUserName.text, email: newEmailAddress.text, password: newPassword.text) {
             performSegue(withIdentifier: "createAccountSegue", sender: nil)
-        } else {
-            inputErrorLabel.text = "could not complete registration :("
-            inputErrorLabel.isHidden = false
         }
     }
     
@@ -276,4 +348,28 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
         }
     }
     
+}
+
+extension CreateAccountViewController: RSKImageCropViewControllerDelegate {
+    func imageCropViewController(_ controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect, rotationAngle: CGFloat) {
+        print("finished cropping")
+        
+        self.profileImageView.image = croppedImage
+        
+        self.presentedViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+    
+    func imageCropViewControllerDidCancelCrop(_ controller: RSKImageCropViewController) {
+        self.presentedViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+    func imageCropViewController(_ controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
+        
+        print("finished cropping")
+        
+        self.profileImageView.image = croppedImage
+        
+        self.presentedViewController?.dismiss(animated: true, completion: nil)
+    }
 }

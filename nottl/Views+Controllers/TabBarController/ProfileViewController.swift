@@ -33,9 +33,10 @@ class ProfileViewController: UIViewController {
         profileImageView.layer.masksToBounds = true
         profileImageView.layer.borderColor = nottlRed.cgColor
         profileImageView.layer.borderWidth = 2.0
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         fetchUserData()
-        
     }
     
     func fetchUserData() {

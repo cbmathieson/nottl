@@ -148,7 +148,7 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         
         //if checks pass, then send data to firbase auth
         AuthService.instance.loginUser(withEmail: eml, andPassword: pass) { (success, loginError) in
-            print(loginError)
+            print(String(describing: loginError))
             if success {
                 //NOT PERFECT -> want to be able to dismiss to mapVC from login screen but currently cant while being able to swipe to dismiss to AuthVC
                 if AuthService.instance.checkVerification() {

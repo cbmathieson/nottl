@@ -27,8 +27,8 @@ class AuthService {
             
             //upload image to firebase storage
             let imageName = NSUUID().uuidString
-            let storageRef = Storage.storage().reference().child("profile_pictures/\(imageName).png")
-            if let uploadData = profileImage.pngData() {
+            let storageRef = Storage.storage().reference().child("profile_pictures/\(imageName).jpg")
+            if let uploadData = profileImage.compressImage(maxHeight: 50.0, maxWidth: 50.0) {
                 storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
                     if error != nil {
                         print(String(describing: error))

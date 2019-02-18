@@ -70,7 +70,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     }
     
     //add notes currently in array
-    func configureNotesInMap() {
+    @objc func configureNotesInMap() {
         
         //empty notes array
         notes.removeAll()
@@ -283,13 +283,15 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
                 let newNote = ["id": noteName, "uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "isAnonymous": isAnonymous, "latitude": fullLatitude, "longitude": fullLongitude, "seenBy": seenBy] as [String : Any]
                 DataService.instance.createNewNote(noteData: newNote, latitude: latitude, longitude: longitude, noteImage: image, completion: { (success) -> Void in
                     if !success {
-                        print("could not add new note because one already exists there")
+                        print("could not add new note, something went wrong uploading :(")
+                        print("there may be a note already there")
+                    } else {
+                        //wait for a sec before updating map
+                        self.perform(#selector(self.configureNotesInMap), with: nil, afterDelay: 3.0)
                     }
                 })
             }
         }, withCancel: nil)
-        
-        //TODO: WHEN LOADING MAP REGION FOR-LOOP THROUGH ALL NEARBY (IN VIEW) ANNOTATIONS
     }
     
     @IBAction func newNoteButtonPressed(_ sender: Any) {
