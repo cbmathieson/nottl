@@ -218,19 +218,6 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
         picker.dismiss(animated: true, completion: nil)
     }
     
-    /*internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        
-        if let image : UIImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            picker.dismiss(animated: false, completion: { () -> Void in
-                var imageCropVC : RSKImageCropViewController!
-                imageCropVC = RSKImageCropViewController(image: image, cropMode: .circle)
-                imageCropVC.delegate = self
-                print("made it this far...")
-                self.navigationController?.pushViewController(imageCropVC, animated: true)
-            })
-        }
-    }*/
-    
     @IBAction func createAccount(_ sender: Any?) {
         self.view.window?.endEditing(true)
         if startRegistration(username: newUserName.text, email: newEmailAddress.text, password: newPassword.text) {

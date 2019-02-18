@@ -22,13 +22,12 @@ extension UIImage {
     //resize note images on upload
     //noteImage = 640.0*1136.0
     //profile image = 120*120
-    func compressImage(maxHeight: CGFloat, maxWidth: CGFloat) -> Data? {
+    func compressImage(maxHeight: CGFloat, maxWidth: CGFloat, compressionQuality: CGFloat) -> Data? {
         // Reducing file size to a 10th
         var actualHeight: CGFloat = self.size.height
         var actualWidth: CGFloat = self.size.width
         var imgRatio: CGFloat = actualWidth/actualHeight
         let maxRatio: CGFloat = maxWidth/maxHeight
-        var compressionQuality: CGFloat = 0.5
         
         if actualHeight > maxHeight || actualWidth > maxWidth {
             if imgRatio < maxRatio {
@@ -44,7 +43,6 @@ extension UIImage {
             } else {
                 actualHeight = maxHeight
                 actualWidth = maxWidth
-                compressionQuality = 1
             }
         }
         let rect = CGRect(x: 0.0, y: 0.0, width: actualWidth, height: actualHeight)

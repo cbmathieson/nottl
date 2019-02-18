@@ -169,11 +169,6 @@ class ImageDetailsViewController: UIViewController, UIScrollViewDelegate {
         //still needs implementation
     }
     
-    //assigns note to your favorites
-    @IBAction func favoritedNote(_ sender: Any) {
-        //still needs implementation
-    }
-    
     //dismiss function
     @IBAction func unwindToInitialVC(_ sender: Any) {
         dismiss(animated: true, completion: nil)

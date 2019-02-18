@@ -19,10 +19,12 @@ class Note: NSObject {
     var userName: String
     var latitude: Double
     var longitude: Double
+    var dateC: String
+    var dateF: String
     //will be a list of uids so we can relate to their profile
     var seenBy: [String]
     
-    init(caption: String, id: String, isAnonymous: Bool, noteImage: String, profileImage: String, userName: String, latitude: Double, longitude: Double, seenBy: [String]) {
+    init(caption: String, id: String, isAnonymous: Bool, noteImage: String, profileImage: String, userName: String, latitude: Double, longitude: Double, dateC: String, dateF: String, seenBy: [String]) {
         self.caption = caption
         self.id = id
         self.isAnonymous = isAnonymous
@@ -31,6 +33,8 @@ class Note: NSObject {
         self.userName = userName
         self.latitude = latitude
         self.longitude = longitude
+        self.dateC = dateC
+        self.dateF = dateF
         //should initialize with empty array but adding for testing
         self.seenBy = seenBy
         

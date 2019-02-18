@@ -51,6 +51,10 @@ class DataService {
         var noteData = noteData
         //gets location of note to reference as user
         var noteLocationPath = ""
+        //get timestamp for note
+        let timestamp = getCurrentTime()
+        noteData["dateC"] = timestamp
+        noteData["dateF"] = ""
         
         guard let imageName = noteData["id"] as? String else {
             print("failed to get note id")
@@ -61,7 +65,7 @@ class DataService {
         let storageRef = Storage.storage().reference().child("notes/\(imageName).jpg")
         
         //compress image to <100KB ... hopefully
-        guard let uploadData = noteImage.compressImage(maxHeight: 640.0, maxWidth: 1136.0) else {
+        guard let uploadData = noteImage.compressImage(maxHeight: 640.0, maxWidth: 1136.0, compressionQuality: 0.5) else {
             print("could not compress image data")
             completion(false)
             return
@@ -125,4 +129,17 @@ class DataService {
         let favoriteNoteURL = String(describing: self.REF_MAPPED_NOTES.child(latitude).child(longitude))
         REF_USERS.child(uid).child("favorites").child(note.id).setValue(favoriteNoteURL)
     }
+    
+    func getCurrentTime() -> String {
+        let date = Date()
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        let day = calendar.component(.day, from: date)
+        let hour = calendar.component(.hour, from: date)
+        let minutes = calendar.component(.minute, from: date)
+        let seconds = calendar.component(.second, from: date)
+        return "\(year)/\(month)/\(day)/\(hour):\(minutes):\(seconds)"
+    }
+    
 }
