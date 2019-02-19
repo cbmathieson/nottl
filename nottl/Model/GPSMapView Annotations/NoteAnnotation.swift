@@ -10,21 +10,12 @@ import Foundation
 import MapKit
 
 class NoteAnnotation: NSObject, MKAnnotation {
-    var note: Note
-    var coordinate: CLLocationCoordinate2D {
-        return CLLocationCoordinate2D(latitude: note.latitude, longitude: note.longitude)
-    }
+    var noteID: String
+    var coordinate: CLLocationCoordinate2D
     
-    init(note: Note) {
-        self.note = note
+    init(noteID: String, coordinate: CLLocationCoordinate2D) {
+        self.noteID = noteID
+        self.coordinate = coordinate
         super.init()
-    }
-    
-    var title: String? {
-        return note.userName
-    }
-    
-    var subtitle: String? {
-        return note.caption
     }
 }

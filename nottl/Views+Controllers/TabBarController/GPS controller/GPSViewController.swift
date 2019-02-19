@@ -25,7 +25,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     var zoomIn = false
     var selectedNote: Note?
     var currentUserImage: UIImage?
-    var notes = [Note]()
+    var pins = [NoteAnnotation]()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -72,8 +72,6 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
     //add notes currently in array
     @objc func configureNotesInMap() {
         
-        //empty notes array
-        notes.removeAll()
         //remove old overlays
         let overlays = mapView.overlays
         mapView.removeOverlays(overlays)
@@ -81,21 +79,26 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         
         //TODO: optimize to only get notes in visible range of the map!!
         //this will mean hopefully figuring out how to grab only certain sections of a dictionary from the database
-        Database.database().reference().child("notes").observeSingleEvent(of: .value) { (snapshot) in
+        Database.database().reference().child("map").observeSingleEvent(of: .value) { (snapshot) in
             if let latDictionary = snapshot.value as? [String: AnyObject] {
-                for (_,value) in latDictionary {
+                for (lat,value) in latDictionary {
                     if let lonDictionary = value as? [String: AnyObject] {
-                        for (_, value) in lonDictionary {
-                            if let noteDictionary = value as? [String: AnyObject] {
+                        for (lon, value) in lonDictionary {
+                            if let noteID = value as? String {
                                 
-                                guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let seenBy = noteDictionary["seenBy"] as? [String], let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
-                                    print("failed to get note data")
+                                guard let coordinate = self.makeCoordinate(lat: lat, lon: lon) else {
+                                    print("failed to get coordinates!")
                                     break
                                 }
                                 
-                                let newNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenBy)
+                                print(noteID)
                                 
-                                self.notes.append(newNote)
+                                let newPin = NoteAnnotation(noteID: noteID, coordinate: coordinate)
+                                
+                                self.pins.append(newPin)
+                            } else {
+                                print("could not get noteID :(")
+                                break
                             }
                         }
                     }
@@ -103,13 +106,53 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
             }
             
             var annotations = [MKAnnotation]()
-            
-            for note in self.notes {
-                let annotation = NoteAnnotation(note: note)
-                annotations.append(annotation)
+            for pin in self.pins {
+                annotations.append(pin)
             }
             self.mapView.removeAnnotations(self.mapView.annotations)
             self.mapView.addAnnotations(annotations)
+        }
+    }
+    
+    func makeCoordinate(lat: String,lon: String) -> CLLocationCoordinate2D? {
+        var latArr = lat.compactMap{$0}
+        var lonArr = lon.compactMap{$0}
+        
+        let latLength = latArr.count
+        let lonLength = lonArr.count
+        
+        latArr.insert(".", at: (latLength-5))
+        lonArr.insert(".", at: (lonLength-5))
+        
+        //make sure it will format properly if no leading zero and only decimal
+        //-----------
+        if(latArr[0] == ".") {
+            latArr.insert("0", at: 0)
+        } else if latArr[0] == "-" && latArr[1] == "." {
+            latArr.insert("0", at: 1)
+        }
+        
+        if(lonArr[0] == ".") {
+            lonArr.insert("0", at: 0)
+        } else if lonArr[0] == "-" && lonArr[1] == "." {
+            lonArr.insert("0", at: 1)
+        }
+        //-----------
+        
+        var latStr = ""
+        for i in latArr {
+            latStr += String(i)
+        }
+        
+        var lonStr = ""
+        for i in lonArr {
+            lonStr += String(i)
+        }
+        
+        if let latitude = Double(latStr), let longitude = Double(lonStr) {
+            return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        } else {
+            return nil
         }
     }
     
@@ -255,9 +298,6 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
         let latitude = fullLatitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
         let longitude = fullLongitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
         
-        //give note/noteImage unique linked identifier
-        let noteName = NSUUID().uuidString
-        
         //get current user information
         guard let uid = Auth.auth().currentUser?.uid else {
             print("failed to get user information")
@@ -281,7 +321,7 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
                 
                 let seenBy = ["uids here"]
                 
-                let newNote = ["id": noteName, "uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "isAnonymous": isAnonymous, "latitude": fullLatitude, "longitude": fullLongitude, "seenBy": seenBy] as [String : Any]
+                let newNote = ["uid": uid, "userName": username!, "profileImage": profileImageURL!, "noteImage": "", "caption": caption, "isAnonymous": isAnonymous, "latitude": fullLatitude, "longitude": fullLongitude, "seenBy": seenBy] as [String : Any]
                 DataService.instance.createNewNote(noteData: newNote, latitude: latitude, longitude: longitude, noteImage: image, completion: { (success) -> Void in
                     if !success {
                         print("could not add new note, something went wrong uploading :(")

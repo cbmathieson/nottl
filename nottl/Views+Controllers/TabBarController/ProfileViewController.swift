@@ -14,7 +14,6 @@ class ProfileViewController: UIViewController {
     //profile information
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var profileName: UILabel!
-    @IBOutlet weak var caption: UILabel!
     
     //interactions
     @IBOutlet weak var myNotesButton: UIButton!
@@ -42,14 +41,13 @@ class ProfileViewController: UIViewController {
     func fetchUserData() {
         guard let uid = Auth.auth().currentUser?.uid else {
             print("no user logged in!")
-            profileName.text = "nil user :("
+            profileName.text = ""
             return
         }
         Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 //get dictionary values
                 self.profileName.text = dictionary["username"] as? String
-                self.caption.text = dictionary["caption"] as? String
                 
                 //convert profileImageURL to image from storage
                 guard let profileImageURL = dictionary["profileImageLink"] as? String else {

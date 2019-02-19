@@ -28,7 +28,7 @@ class AuthService {
             //upload image to firebase storage
             let imageName = NSUUID().uuidString
             let storageRef = Storage.storage().reference().child("profile_pictures/\(imageName).jpg")
-            if let uploadData = profileImage.compressImage(maxHeight: 75.0, maxWidth: 75.0, compressionQuality: 0.8) {
+            if let uploadData = profileImage.compressImage(maxHeight: 175.0, maxWidth: 175.0, compressionQuality: 0.5) {
                 storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
                     if error != nil {
                         print(String(describing: error))
@@ -50,11 +50,11 @@ class AuthService {
                         }
                         
                         //if successful, add the new user to the database
-                        //Adding ability to add captions later on...
+                        //Adding ability to add captions later on...?
                         let favorites = ["favorite notes here"]
                         let myNotes = ["my notes here"]
                         
-                        let userData = ["provider": user.providerID, "email": user.email!, "username": username, "caption": "", "profileImageLink": profileImageLink, "favorites": favorites, "myNotes": myNotes] as [String: Any]
+                        let userData = ["provider": user.providerID, "email": user.email!, "username": username, "profileImageLink": profileImageLink, "favorites": favorites, "myNotes": myNotes] as [String: Any]
                         DataService.instance.createDBUser(uid: user.uid, userData: userData as Dictionary<String, Any>)
                         userCreationCompleted(true, nil)
                     })

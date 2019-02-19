@@ -194,24 +194,15 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
     
     internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
-            profileImageView.image = image
-            imageSelectButton.setTitle("", for: .normal)
-            imageChosen = image
-        } else if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            profileImageView.image = image
-            imageSelectButton.setTitle("", for: .normal)
-            imageChosen = image
-        } else {
-            print("something went wrong :(")
-        }
-        picker.dismiss(animated: false, completion: { () -> Void in
-            if let image = self.profileImageView.image {
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            picker.dismiss(animated: true, completion: { () -> Void in
                 let imageCropViewController = RSKImageCropViewController(image: image)
                 imageCropViewController.delegate = self
                 self.present(imageCropViewController, animated: true, completion: nil)
-            }
-        })
+            })
+        } else {
+            print("something went wrong :(")
+        }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -278,14 +269,11 @@ class CreateAccountViewController: UIViewController, UITextFieldDelegate, UIImag
             return false
         }
         
-        guard var image = imageChosen else {
+        guard let image = imageChosen else {
             inputErrorLabel.text = "please select a profile image"
             inputErrorLabel.isHidden = false
             return false
         }
-        
-        //make image 75*75
-        image = image.imageWith(newSize: CGSize(width: 75, height: 75))
         
         var registrationSuccess = true
 
@@ -341,22 +329,15 @@ extension CreateAccountViewController: RSKImageCropViewControllerDelegate {
     func imageCropViewController(_ controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect, rotationAngle: CGFloat) {
         print("finished cropping")
         
-        self.profileImageView.image = croppedImage
+        imageSelectButton.setTitle("", for: .normal)
+        profileImageView.image = croppedImage
+        imageChosen = croppedImage
         
-        self.presentedViewController?.dismiss(animated: true, completion: nil)
+        presentedViewController?.dismiss(animated: true, completion: nil)
     }
     
     
     func imageCropViewControllerDidCancelCrop(_ controller: RSKImageCropViewController) {
-        self.presentedViewController?.dismiss(animated: true, completion: nil)
-    }
-    
-    func imageCropViewController(_ controller: RSKImageCropViewController, didCropImage croppedImage: UIImage, usingCropRect cropRect: CGRect) {
-        
-        print("finished cropping")
-        
-        self.profileImageView.image = croppedImage
-        
-        self.presentedViewController?.dismiss(animated: true, completion: nil)
+        presentedViewController?.dismiss(animated: true, completion: nil)
     }
 }

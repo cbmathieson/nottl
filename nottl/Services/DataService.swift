@@ -20,7 +20,9 @@ class DataService {
     //user folder
     private var _REF_USERS = DB_BASE.child("users")
     //Notes folder
-    private var _REF_MAPPED_NOTES = DB_BASE.child("notes")
+    private var _REF_MAPPED_NOTES = DB_BASE.child("map")
+    //Map folder
+    private var _REF_ALL_NOTES = DB_BASE.child("notes")
     
     var REF_BASES: DatabaseReference {
         return _REF_BASE
@@ -34,13 +36,37 @@ class DataService {
         return _REF_MAPPED_NOTES
     }
     
+    var REF_ALL_NOTES: DatabaseReference {
+        return _REF_ALL_NOTES
+    }
+    
     //creates user with userid and values associated as dictionary
     func createDBUser(uid: String, userData: Dictionary<String, Any>) {
         REF_USERS.child(uid).updateChildValues(userData)
     }
     
-    func addToMyNotes(noteURL: String, uid: String) {
-        REF_USERS.child(uid).child("myNotes").childByAutoId().setValue(noteURL)
+    //add to users note folder
+    func addToMyNotes(noteID: String, uid: String) {
+        REF_USERS.child(uid).child("myNotes").childByAutoId().setValue(noteID)
+    }
+    
+    //add to map
+    func addToMap(noteID: String, lat: String, lon: String) {
+        REF_MAPPED_NOTES.child(lat).child(lon).setValue(noteID)
+    }
+    
+    //add to notes
+    func addToAllNotes(noteData: Dictionary<String, Any>) -> String {
+        let urlRef = REF_ALL_NOTES.childByAutoId()
+        
+        var noteDataAlias = noteData
+        if let key = urlRef.key {
+            noteDataAlias["id"] = key
+            urlRef.setValue(noteDataAlias)
+            return key
+        } else {
+            return ""
+        }
     }
     
     //sends new note to firebase
@@ -49,18 +75,12 @@ class DataService {
         //check if value already exists in the space
         //allows dictionary to be mutated
         var noteData = noteData
-        //gets location of note to reference as user
-        var noteLocationPath = ""
         //get timestamp for note
         let timestamp = getCurrentTime()
         noteData["dateC"] = timestamp
         noteData["dateF"] = ""
         
-        guard let imageName = noteData["id"] as? String else {
-            print("failed to get note id")
-            completion(false)
-            return
-        }
+        let imageName = UUID().uuidString
         
         let storageRef = Storage.storage().reference().child("notes/\(imageName).jpg")
         
@@ -98,13 +118,19 @@ class DataService {
                         return
                     }
                     print("attempting to upload note")
-                    self.REF_MAPPED_NOTES.child(latitude).child(longitude).updateChildValues(noteData)
-                    
-                    if let uid = noteData["uid"] as? String {
-                        noteLocationPath = String(describing: snapshot.ref.description())
-                        print(String(describing: noteLocationPath))
+                    let noteID = self.addToAllNotes(noteData: noteData)
+                    if noteID == "" {
+                        print("could not get noteID")
+                        //need to delete the image since its not tied to anything
+                        storageRef.delete()
+                        completion(false)
+                        return
+                    } else {
+                        self.addToMap(noteID: noteID, lat: latitude, lon: longitude)
                         
-                        self.addToMyNotes(noteURL: noteLocationPath, uid: uid)
+                        if let uid = noteData["uid"] as? String {
+                            self.addToMyNotes(noteID: noteID, uid: uid)
+                        }
                     }
                 })
             }
@@ -123,11 +149,8 @@ class DataService {
             return
         }
         
-        let latitude = note.latitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
-        let longitude = note.longitude.truncate(places: 5)!.replacingOccurrences(of: ".", with: "")
-        
-        let favoriteNoteURL = String(describing: self.REF_MAPPED_NOTES.child(latitude).child(longitude))
-        REF_USERS.child(uid).child("favorites").child(note.id).setValue(favoriteNoteURL)
+        //childbyautoid makes all children chronologically sorted!
+        REF_USERS.child(uid).child("favorites").childByAutoId().setValue(note.id)
     }
     
     func getCurrentTime() -> String {
