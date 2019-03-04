@@ -80,7 +80,7 @@ class NoteDetailMapView: UIView {
         userNameLabel.text = note.userName
         descriptionLabel.text = note.caption
         
-        let userCount = "viewed by " + String(note.seenBy.count) + " users"
+        let userCount = String(note.seenBy.count-1) + "♡"
         userCountButton.setTitle(userCount, for: .normal)
     }
     

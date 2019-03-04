@@ -47,7 +47,7 @@ class DataService {
     
     //add to users note folder
     func addToMyNotes(noteID: String, uid: String) {
-        REF_USERS.child(uid).child("myNotes").childByAutoId().setValue(noteID)
+        REF_USERS.child(uid).child("myNotes").child(noteID).setValue(0)
     }
     
     //add to map
@@ -150,7 +150,8 @@ class DataService {
         }
         
         //childbyautoid makes all children chronologically sorted!
-        REF_USERS.child(uid).child("favorites").childByAutoId().setValue(note.id)
+        REF_USERS.child(uid).child("favorites").child(note.id).setValue(0)
+        REF_ALL_NOTES.child(note.id).child("seenBy").child(uid).setValue(0)
     }
     
     func getCurrentTime() -> String {

@@ -91,8 +91,6 @@ class GPSViewController: UIViewController, MKMapViewDelegate, NoteDetailMapViewD
                                     break
                                 }
                                 
-                                print(noteID)
-                                
                                 let newPin = NoteAnnotation(noteID: noteID, coordinate: coordinate)
                                 
                                 self.pins.append(newPin)

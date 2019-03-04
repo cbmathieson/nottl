@@ -87,12 +87,23 @@ class NoteAnnotationView: MKAnnotationView {
                 Database.database().reference().child("notes").child(noteID).observeSingleEvent(of: .value) { (snapshot) in
                     
                     if let noteDictionary = snapshot.value as? [String: AnyObject] {
-                        guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let seenBy = noteDictionary["seenBy"] as? [String], let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
+                        guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
+                            
                             print("failed to get note data")
                             return
                         }
                         
-                        let selectedNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenBy)
+                        var seenByForNote = [String]()
+                        
+                        if let seenBy = noteDictionary["seenBy"] as? [String: AnyObject] {
+                            for (username, _) in seenBy {
+                                seenByForNote.append(username)
+                            }
+                        } else {
+                            seenByForNote.append("0")
+                        }
+                        
+                        let selectedNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenByForNote)
                         
                         noteDetailMapView.configureWithNote(note: selectedNote)
                     }

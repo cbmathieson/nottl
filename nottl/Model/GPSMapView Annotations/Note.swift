@@ -41,6 +41,4 @@ class Note: NSObject {
         super.init()
     }
     
-    func addUserToSeenBy(item: String) { seenBy.append(item) }
-    
 }

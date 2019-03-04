@@ -42,22 +42,40 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchUserData()
-        
         profileImageView.layer.cornerRadius = 45.0
         profileImageView.layer.masksToBounds = true
         profileImageView.layer.borderColor = nottlRed.cgColor
         profileImageView.layer.borderWidth = 2.0
-        
-        perform(#selector(myNotesPressed(_:)), with: nil, afterDelay: 2.0)
     }
     
-    func fetchUserData() {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //wait for request to finish before reloading notes
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            
+            self.fetchUserData(completed: {
+                DispatchQueue.main.async { [weak self] in
+                    if self?.myNotes ?? true {
+                        self?.myNotesTableView.reloadData()
+                    } else {
+                        self?.favoritesTableView.reloadData()
+                    }
+                }
+            })
+        }
+    }
+    
+    func fetchUserData(completed: () -> ()) {
         guard let uid = Auth.auth().currentUser?.uid else {
             print("no user logged in!")
             profileName.text = ""
             return
         }
+        
         Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 //get dictionary values
@@ -69,21 +87,20 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                     return
                 }
                 
+                self.databaseFavoriteNotes.removeAll()
+                self.databaseMyNotes.removeAll()
+                
                 //get favorited note urls
                 if let favorites = dictionary["favorites"] as? [String: AnyObject] {
-                    for (_, value) in favorites {
-                        
-                        if let faveID = value as? String {
-                            self.databaseFavoriteNotes.append(faveID)
-                        }
+                    for (note, _) in favorites {
+                        self.databaseFavoriteNotes.append(note)
                     }
                 }
                 
+                //get favorite urls
                 if let userNotes = dictionary["myNotes"] as? [String: AnyObject] {
-                    for (_, value) in userNotes {
-                        if let userNoteID = value as? String {
-                            self.databaseMyNotes.append(userNoteID)
-                        }
+                    for (note, _) in userNotes {
+                            self.databaseMyNotes.append(note)
                     }
                 }
                 
@@ -106,20 +123,43 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                     
                 }).resume()
                 
-                self.myNotesCount.text = String(self.databaseMyNotes.count)
-                self.favoritesCount.text = String(self.databaseFavoriteNotes.count)
+                if(self.databaseMyNotes.count == 0) {
+                    self.myNotesCount.text = "0";
+                } else {
+                    self.myNotesCount.text = String(self.databaseMyNotes.count-1)
+                }
+                
+                if(self.databaseFavoriteNotes.count == 0) {
+                    self.favoritesCount.text = "0"
+                } else {
+                    self.favoritesCount.text = String(self.databaseFavoriteNotes.count-1)
+                }
+                
+                self.favoriteNotes.removeAll()
+                self.notes.removeAll()
                 
                 //get notes from database
                 for ID in self.databaseFavoriteNotes {
                     Database.database().reference().child("notes").child(ID).observeSingleEvent(of: .value, with: { (snapshot) in
                         
                         if let noteDictionary = snapshot.value as? [String: AnyObject] {
-                            guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let seenBy = noteDictionary["seenBy"] as? [String], let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
+                            guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
                                 print("failed to get note data")
                                 return
                             }
                             
-                            let selectedNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenBy)
+                            var seenByForNote = [String]()
+                            
+                            if let seenBy = noteDictionary["seenBy"] as? [String: AnyObject] {
+                                for (username, _) in seenBy {
+                                    seenByForNote.append(username)
+                                }
+                            } else {
+                                seenByForNote.append("0")
+                            }
+                            
+                            
+                            let selectedNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenByForNote)
                             
                             self.favoriteNotes.append(selectedNote)
                             
@@ -131,22 +171,37 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                     Database.database().reference().child("notes").child(ID).observeSingleEvent(of: .value, with: { (snapshot) in
                         
                         if let noteDictionary = snapshot.value as? [String: AnyObject] {
-                            guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let seenBy = noteDictionary["seenBy"] as? [String], let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
+                            guard let caption = noteDictionary["caption"] as? String, let id = noteDictionary["id"] as? String, let isAnonymous = noteDictionary["isAnonymous"] as? Bool, let noteImage = noteDictionary["noteImage"] as? String, let profileImage = noteDictionary["profileImage"] as? String, let userName = noteDictionary["userName"] as? String, let latitude = noteDictionary["latitude"] as? Double, let longitude = noteDictionary["longitude"] as? Double, let dateC = noteDictionary["dateC"] as? String, let dateF = noteDictionary["dateF"] as? String else {
                                 print("failed to get note data")
                                 return
                             }
                             
-                            let selectedNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenBy)
+                            var seenByForNote = [String]()
+                            
+                            if let seenBy = noteDictionary["seenBy"] as? [String: AnyObject] {
+                                for (username, _) in seenBy {
+                                    seenByForNote.append(username)
+                                }
+                            } else {
+                                seenByForNote.append("0")
+                            }
+                            
+                            let selectedNote = Note(caption: caption, id: id, isAnonymous: isAnonymous, noteImage: noteImage, profileImage: profileImage, userName: userName, latitude: latitude, longitude: longitude, dateC: dateC, dateF: dateF, seenBy: seenByForNote)
                             
                             self.notes.append(selectedNote)
                             
                         }
                     })
                 }
-                
             }
         }, withCancel: nil)
-        
+
+        while(true) {
+            if(self.databaseFavoriteNotes.count-1 == favoriteNotes.count && self.databaseMyNotes.count-1 == notes.count) {
+                completed()
+                break
+            }
+        }
     }
     
     @IBAction func myNotesPressed(_ sender: Any) {
@@ -155,7 +210,9 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         myFavoritesButton.setTitleColor(nottlGrey, for: .normal)
         myNotesUnderlay.isHidden = false
         favoritesUnderlay.isHidden = true
-        self.myNotesTableView.reloadData()
+        fetchUserData { () -> () in
+            myNotesTableView.reloadData()
+        }
         favoritesView.isHidden = true
         myNotesView.isHidden = false
     }
@@ -166,7 +223,9 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         myFavoritesButton.setTitleColor(nottlRed, for: .normal)
         myNotesUnderlay.isHidden = true
         favoritesUnderlay.isHidden = false
-        self.favoritesTableView.reloadData()
+        fetchUserData { () -> () in
+            favoritesTableView.reloadData()
+        }
         favoritesView.isHidden = false
         myNotesView.isHidden = true
     }
@@ -190,9 +249,15 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             
             cell.profileName.text = note.userName
             cell.noteDescription.text = note.caption
-            cell.favoritesCount.text = String(12)
-            //need to get profile image from note.profileImage url
+            if(note.seenBy.count == 1) {
+                cell.favoritesCount.font = cell.favoritesCount.font.withSize(25)
+                cell.favoritesCount.text = "_♡"
+            } else {
+                cell.favoritesCount.font = cell.favoritesCount.font.withSize(17)
+                cell.favoritesCount.text = String(note.seenBy.count-1) + "♡"
+            }
             
+            //get profile picture from server
             let url = URL(string: note.profileImage)
             
             URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
@@ -220,10 +285,14 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             note = notes[indexPath.row]
 
             cell.noteDescription.text = note.caption
-            cell.favoriteCount.text = String(69)
+            if(note.seenBy.count == 1) {
+                cell.favoriteCount.text = "_♡"
+            } else {
+                cell.favoriteCount.text = String(note.seenBy.count-1) + "♡"
+            }
             
             // get cell.noteImage from note.noteImage url
-            let url = URL(string: note.profileImage)
+            let url = URL(string: note.noteImage)
             
             URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
                 
