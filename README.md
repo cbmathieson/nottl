@@ -48,11 +48,12 @@ Making it work:
 - Mapkit
 - CLLocationManager
 - Firebase Database
-- Haversine Formula
+- Custom Annotations/Annotation Views
 
 ### Finding a Note
 
 Get within 50m of a note and the image can be revealed!
+Tap favorite to append to your profile's favorites
 
 <img src="gifs/finding_note.gif" width="250">
 
@@ -60,8 +61,8 @@ Making it work:
 - Generating background threads (GCD) -> Fetching server data
 - URLSession (Fetching images from urls)
 - TableViews (Dealing with bugs dequeuing reusable cells)
-- Custom Annotations
 - Firebase Database
+- Haversine Formula
 
 ## Incomplete
 
