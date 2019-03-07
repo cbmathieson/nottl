@@ -190,6 +190,7 @@
                                                     <outlet property="noteDescription" destination="9t8-ZP-3MU" id="ULN-Wn-Sfh"/>
                                                     <outlet property="noteImage" destination="D4S-Zy-7v1" id="3hv-xo-ZtH"/>
                                                     <outlet property="profileName" destination="haC-IX-EHq" id="LS4-tR-VAH"/>
+                                                    <segue destination="OEX-RS-PbE" kind="presentation" identifier="favoriteNoteDetail" id="Pur-Zl-pSW"/>
                                                 </connections>
                                             </tableViewCell>
                                         </prototypes>
@@ -272,6 +273,7 @@
                                                     <outlet property="favoriteCount" destination="5il-aQ-0Bx" id="lyv-JY-xKG"/>
                                                     <outlet property="noteDescription" destination="Hr1-eH-xTf" id="Oai-bg-K4c"/>
                                                     <outlet property="noteImage" destination="Dmd-2P-oxB" id="l0G-Xp-Lpa"/>
+                                                    <segue destination="OEX-RS-PbE" kind="presentation" identifier="myNoteImageDetail" id="Nr9-oz-Q9a"/>
                                                 </connections>
                                             </tableViewCell>
                                         </prototypes>
@@ -292,6 +294,16 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ywW-Qf-kc3" userLabel="Top Bar">
                                 <rect key="frame" x="0.0" y="20" width="375" height="30"/>
                                 <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EwB-2I-0lo">
+                                        <rect key="frame" x="15" y="-3" width="30" height="36"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="20"/>
+                                        <state key="normal" title="⇣">
+                                            <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="reloadData:" destination="2Gv-7P-CwP" eventType="touchUpInside" id="MUC-L5-1pH"/>
+                                        </connections>
+                                    </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="12" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wF1-bK-93E">
                                         <rect key="frame" x="180.5" y="4.5" width="14.5" height="21.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="18"/>
@@ -314,8 +326,10 @@
                                     <constraint firstItem="wF1-bK-93E" firstAttribute="centerY" secondItem="ywW-Qf-kc3" secondAttribute="centerY" id="Jzl-JH-Vuq"/>
                                     <constraint firstItem="fLX-ck-QsU" firstAttribute="top" secondItem="ywW-Qf-kc3" secondAttribute="top" constant="2.5" id="Ore-41-QH3"/>
                                     <constraint firstItem="wF1-bK-93E" firstAttribute="centerX" secondItem="ywW-Qf-kc3" secondAttribute="centerX" id="VZa-iY-tYp"/>
+                                    <constraint firstItem="EwB-2I-0lo" firstAttribute="leading" secondItem="ywW-Qf-kc3" secondAttribute="leading" constant="15" id="bRM-Zu-avU"/>
                                     <constraint firstAttribute="trailing" secondItem="fLX-ck-QsU" secondAttribute="trailing" constant="10" id="ebn-b4-Y50"/>
                                     <constraint firstAttribute="bottom" secondItem="fLX-ck-QsU" secondAttribute="bottom" constant="2.5" id="jZi-Ez-q4z"/>
+                                    <constraint firstItem="EwB-2I-0lo" firstAttribute="centerY" secondItem="ywW-Qf-kc3" secondAttribute="centerY" id="yLq-oN-2Kc"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="65T-tT-LUQ" userLabel="Profile Desc">
@@ -1053,7 +1067,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PLq-em-wEE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="8734" y="305"/>
+            <point key="canvasLocation" x="8727" y="690"/>
         </scene>
         <!--Image Details View Controller-->
         <scene sceneID="PYw-Do-g1I">
@@ -1248,7 +1262,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rZb-XW-5s3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="8731.875" y="-1166.1971830985915"/>
+            <point key="canvasLocation" x="7090" y="690"/>
         </scene>
         <!--Recents View Controller-->
         <scene sceneID="9eo-KJ-4rW">
@@ -2072,4 +2086,7 @@
         <image name="settings_bttn" width="120" height="120"/>
         <image name="x_button" width="300" height="300"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="Pur-Zl-pSW"/>
+    </inferredMetricsTieBreakers>
 </document>

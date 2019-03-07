@@ -22,6 +22,12 @@ class ProfileViewControllerTableViewCell: UITableViewCell {
         
         // Initialization code
     }
+    
+    override func prepareForReuse() {
+        noteImage.image = nil
+        favoriteCount.text = nil
+        noteDescription.text = nil
+    }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

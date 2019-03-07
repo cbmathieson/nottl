@@ -21,10 +21,16 @@ class FavoritesTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
     }
+    
+    override func prepareForReuse() {
+        noteImage.image = nil
+        favoritesCount.text = nil
+        noteDescription.text = nil
+        profileName.text = nil
+    }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
         // Configure the view for the selected state
     }
 
