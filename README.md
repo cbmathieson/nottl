@@ -4,7 +4,7 @@
 
 *Currently under development.*
 
-Leave a note where you are -> see if anyone finds it!
+Leave a note where you are -> see if anyone finds it! <br/>
 The app restricts users from opening notes > 50m away.
 
 ## Completed
@@ -39,7 +39,7 @@ Making it work:
 
 ### Dropping a Note
 
-Choose an image, choose a caption!
+Choose an image, choose a caption! <br/>
 Posted images show up on your profile page.
 
 <img src="gifs/creating_note.gif" width="250">
@@ -52,7 +52,7 @@ Making it work:
 
 ### Finding a Note
 
-Get within 50m of a note and the image can be revealed!
+Get within 50m of a note and the image can be revealed! <br/>
 Tap favorite to append to your profile's favorites
 
 <img src="gifs/finding_note.gif" width="250">
